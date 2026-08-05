@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TechGeekPH New Client Registration</title>
+  <title>TechGeekPH Service Request &amp; Field Report</title>
   <style>
     :root {
       --blue: #064f83;
@@ -133,7 +133,7 @@
 
     .nav summary::-webkit-details-marker { display: none; }
     .nav summary::after {
-      content: "â–¾";
+      content: "▾";
       margin-left: auto;
       font-size: 0.78rem;
       opacity: 0.72;
@@ -501,6 +501,32 @@
     .primary-btn:disabled, .ghost-btn:disabled, .danger-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+    }
+
+    .required-label::after {
+      content: " *";
+      color: var(--danger);
+      font-weight: 950;
+    }
+
+    .save-requirements {
+      flex: 1 1 320px;
+      margin: 0 auto 0 0;
+      color: var(--danger);
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .save-requirements.is-ready {
+      color: var(--ok);
+    }
+
+    .was-validated input:invalid,
+    .was-validated select:invalid,
+    .was-validated textarea:invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 2px rgba(201, 20, 72, 0.08);
     }
 
     .toolbar {
@@ -951,7 +977,7 @@
     }
 
     .nav-toggle::after {
-      content: "â€º" !important;
+      content: "›" !important;
       margin-left: auto !important;
       font-size: 0.95rem !important;
       opacity: 0.75 !important;
@@ -1252,9 +1278,9 @@
       <header class="topbar public-topbar">
   <a class="portal-back" href="../index.html">Main Portal</a>
   <div class="hero-copy">
-    <span class="eyebrow">TechGeekPH Public Registration</span>
-    <h1>New Client Registration</h1>
-    <p>Fill out the application form below. No admin or employee account is required.</p>
+    <span class="eyebrow">TechGeekPH Service Reporting</span>
+    <h1>Service Request &amp; Field Report</h1>
+    <p>Use this form for new installations, relocations, repairs, and other reported work.</p>
   </div>
   <div class="user-chip public-chip">
     <div class="avatar" id="avatar">TG</div>
@@ -1268,13 +1294,54 @@
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2>New Client Application</h2>
-              <p>Fill up personal information, service details, network details, payment, photos, terms, and Google Maps location.</p>
+              <h2>Client Service Application &amp; Work Report</h2>
+              <p>Choose the work type, then complete the client, service, schedule, payment, photo, and location details.</p>
             </div>
             <span class="mode-chip" id="sheetChip">Sheet: New Client</span>
           </div>
 
           <form id="applicationForm" class="form-wrap">
+            <div class="section">
+              <div class="section-title"><h3>Work Request Details</h3><span>Required for every reported activity</span></div>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="workType">Work Type</label>
+                  <select id="workType" name="Work Type">
+                    <option value="">Select work type</option>
+                    <option value="New Installation">New Installation</option>
+                    <option value="Relocation">Relocation</option>
+                    <option value="Repair">Repair</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <small id="workTypeNote">Select the activity being reported.</small>
+                </div>
+
+                <div class="field">
+                  <label for="workStatus">Work Status</label>
+                  <select id="workStatus" name="Work Status">
+                    <option value="">Select status</option>
+                    <option value="For Scheduling">For Scheduling</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Rescheduled">Rescheduled</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div class="field wide is-hidden" id="previousAddressField">
+                  <label for="previousAddress">Previous Service Address</label>
+                  <input id="previousAddress" name="Previous Service Address" placeholder="Required for relocation: old house / service address">
+                </div>
+
+                <div class="field full">
+                  <label for="workDetails">Concern / Work Report Details</label>
+                  <textarea id="workDetails" name="Concern / Work Report Details" placeholder="Describe the requested work, client concern, damage, repair needed, or activity at another site."></textarea>
+                  <small>For Other, include the exact work performed and site/location.</small>
+                </div>
+              </div>
+            </div>
+
             <div class="section">
               <div class="section-title"><h3>Personal Information</h3><span>Client identity</span></div>
               <div class="form-grid">
@@ -1289,7 +1356,7 @@
             </div>
 
             <div class="section">
-              <div class="section-title"><h3>Address Line</h3><span>Installation address</span></div>
+              <div class="section-title"><h3>Service / Work Address</h3><span>New address or actual work site</span></div>
               <div class="form-grid">
                 <div class="field"><label for="houseNumber">House Number</label><input id="houseNumber" name="House Number" placeholder="Blk / Lot / House #"></div>
                 <div class="field wide"><label for="streetName">Street Name</label><input id="streetName" name="Street Name" placeholder="Street / Purok"></div>
@@ -1345,16 +1412,16 @@
             </div>
 
             <div class="section">
-              <div class="section-title"><h3>Payment Method</h3><span>Cashout + optional prorated bill</span></div>
+              <div class="section-title"><h3>Payment Method</h3><span>Service fee + optional prorated bill</span></div>
               <div class="form-grid">
                 <div class="field computed-field">
-                  <label for="cashoutFee">Cashout / Activation Fee</label>
-                  <input id="cashoutFee" name="Cashout / Activation Fee" inputmode="decimal" value="800" placeholder="800">
+                  <label for="cashoutFee" id="cashoutFeeLabel">Service / Processing Fee</label>
+                  <input id="cashoutFee" name="Cashout / Activation Fee" inputmode="decimal" placeholder="Auto from work type">
                 </div>
 
                 <div class="field">
                   <label for="cash">Cash</label>
-                  <input id="cash" name="Cash" inputmode="decimal" value="800" placeholder="0">
+                  <input id="cash" name="Cash" inputmode="decimal" placeholder="0">
                 </div>
 
                 <div class="field">
@@ -1382,7 +1449,7 @@
                     <input id="payProratedBill" name="Pay Prorated Bill" type="checkbox" value="Yes">
                     Include prorated bill until next 10th due date
                   </label>
-                  <p class="payment-note">Formula: Monthly Fee Ã· 30 Ã— counted days from installation date up to next 10th due date.</p>
+                  <p class="payment-note">Formula: Monthly Fee ÷ 30 × counted days from installation date up to next 10th due date.</p>
                 </div>
 
                 <div class="field computed-field">
@@ -1413,10 +1480,10 @@
             </div>
 
             <div class="section">
-              <div class="section-title"><h3>Installation Date</h3><span>Schedule and technician</span></div>
+              <div class="section-title"><h3>Work Schedule &amp; Completion</h3><span>Schedule, actual work time, and technician</span></div>
               <div class="form-grid">
-                <div class="field"><label for="dateToday">Date Today</label><input id="dateToday" name="Date Today" type="date"></div>
-                <div class="field"><label for="dateInstalled">Date Installed</label><input id="dateInstalled" name="Date Installed" type="date"></div>
+                <div class="field"><label for="dateToday">Report Date</label><input id="dateToday" name="Date Today" type="date"></div>
+                <div class="field"><label for="dateInstalled">Scheduled / Work Date</label><input id="dateInstalled" name="Date Installed" type="date"></div>
                 <div class="field"><label for="timeStart">Time Start</label><input id="timeStart" name="Time Start" type="time"></div>
                 <div class="field"><label for="timeEnd">Time End</label><input id="timeEnd" name="Time End" type="time"></div>
                 <div class="field wide"><label for="assignedTechnician">Assigned Technician</label><input id="assignedTechnician" name="Assigned Technician" placeholder="Technician name"></div>
@@ -1424,25 +1491,25 @@
             </div>
 
             <div class="section">
-              <div class="section-title"><h3>Installation Photos</h3><span>Select files from phone or PC storage</span></div>
+              <div class="section-title"><h3>Work Documentation Photos</h3><span>Required proof for every reported activity</span></div>
               <div class="form-grid">
                 <div class="field wide">
-                  <label for="fixPositionRouterPhoto">Fix Position Router Photo</label>
+                  <label for="fixPositionRouterPhoto">Router / Work Area Photo</label>
                   <input id="fixPositionRouterPhoto" name="Fix Position Router Photo" type="file" accept="image/*,.pdf">
                   <small class="file-note" id="fixPositionRouterPhotoNote">No file selected. Image/PDF will auto-upload to Drive when saved.</small>
                 </div>
                 <div class="field wide">
-                  <label for="scReadingPhoto">SC Connector Reading on Client Side Photo</label>
+                  <label for="scReadingPhoto">Signal / SC Connector Reading Photo</label>
                   <input id="scReadingPhoto" name="SC Connector Reading on Client Side Photo" type="file" accept="image/*,.pdf">
                   <small class="file-note" id="scReadingPhotoNote">No file selected. Image/PDF will auto-upload to Drive when saved.</small>
                 </div>
                 <div class="field wide">
-                  <label for="frontHousePhoto">Front House / See Full House on Frame</label>
+                  <label for="frontHousePhoto">House / Actual Work Site Photo</label>
                   <input id="frontHousePhoto" name="Front House / See Full House on Frame" type="file" accept="image/*,.pdf">
                   <small class="file-note" id="frontHousePhotoNote">No file selected. Image/PDF will auto-upload to Drive when saved.</small>
                 </div>
                 <div class="field wide">
-                  <label for="idPicture">ID Picture</label>
+                  <label for="idPicture">Client ID / Supporting Photo</label>
                   <input id="idPicture" name="ID Picture" type="file" accept="image/*,.pdf">
                   <small class="file-note" id="idPictureNote">No file selected. Image/PDF will auto-upload to Drive when saved.</small>
                 </div>
@@ -1513,8 +1580,8 @@
                       7.1 A rebate may be granted for full-service interruptions lasting more than 24 hours.<br>
                       7.2 A written request must be submitted within 7 days from the interruption.<br>
                       7.3 Rebate calculation:<br>
-                      &nbsp;&nbsp;&nbsp;&nbsp;Monthly Fee Ã· 30 = Daily Rate<br>
-                      &nbsp;&nbsp;&nbsp;&nbsp;Daily Rate Ã— Number of days without service<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;Monthly Fee ÷ 30 = Daily Rate<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;Daily Rate × Number of days without service<br>
                       7.4 Rebates are the only form of compensation.
                     </div>
 
@@ -1550,8 +1617,9 @@
             </div>
 
             <div class="form-actions">
+              <p class="save-requirements" id="saveStatus" role="status" aria-live="polite">Complete all required fields to enable Save Application.</p>
               <button class="ghost-btn" type="button" id="clearBtn">Clear Form</button>
-              <button class="primary-btn" type="submit" id="saveBtn">Save Application</button>
+              <button class="primary-btn" type="submit" id="saveBtn" disabled>Save Application</button>
             </div>
           </form>
         </section>
@@ -1581,7 +1649,47 @@
       { plan: "Biz Plan", speed: "200Mbps", fee: 1599, type: "Business" }
     ];
 
+    const WORK_TYPE_CONFIG = {
+      "New Installation": {
+        fee: 800,
+        feeLabel: "Cashout / Activation Fee",
+        note: "New client installation. Standard cashout / activation fee is ₱800.",
+        detailsPlaceholder: "Describe the new installation request, line route, special instructions, or client notes."
+      },
+      "Relocation": {
+        fee: 500,
+        feeLabel: "Relocation Fee",
+        note: "Existing client transferring to a new house. Relocation fee is ₱500.",
+        detailsPlaceholder: "Describe the relocation request, old line status, new address instructions, and preferred schedule."
+      },
+      "Repair": {
+        fee: 0,
+        feeLabel: "Repair / Service Fee",
+        note: "Scheduled client concern for damaged, disconnected, weak, or malfunctioning service.",
+        detailsPlaceholder: "Describe the client concern, symptoms, damaged item, troubleshooting done, and repair needed."
+      },
+      "Other": {
+        fee: 0,
+        feeLabel: "Other Work Fee",
+        note: "For work not included in today's assigned tasks or work performed at another site.",
+        detailsPlaceholder: "Describe the exact work performed, reason, requesting person, and other site/location."
+      }
+    };
+
     let applications = [];
+    let isSubmitting = false;
+
+    const REQUIRED_FIELD_IDS = [
+      "workType", "workStatus", "workDetails",
+      "name", "middleName", "surname", "contactNo", "emailAddress", "validIdType", "idNo",
+      "houseNumber", "streetName", "barangay", "cityMunicipality", "postalCode", "country",
+      "plan", "speed", "type", "monthlyFee", "ftthStart", "ftthEnd",
+      "accountNo", "routerModel", "version", "serialNo", "ssid24", "ssid5", "password",
+      "napNo", "lcpNo", "ponStatus", "fiberCore", "scCountUsed", "readingDbm", "napSlotNo", "remainingSlot",
+      "cashoutFee", "dateToday", "dateInstalled", "timeStart", "timeEnd", "assignedTechnician",
+      "fixPositionRouterPhoto", "scReadingPhoto", "frontHousePhoto", "idPicture", "referralBy",
+      "termsAccepted", "agreementNameSignature", "mapsLatitude", "mapsLongitude", "googleMapsLink"
+    ];
 
     const fields = {
       notice: document.querySelector("#notice"),
@@ -1589,11 +1697,18 @@
       userName: document.querySelector("#userName"),
       userRole: document.querySelector("#userRole"),
       form: document.querySelector("#applicationForm"),
+      workType: document.querySelector("#workType"),
+      workStatus: document.querySelector("#workStatus"),
+      workTypeNote: document.querySelector("#workTypeNote"),
+      workDetails: document.querySelector("#workDetails"),
+      previousAddress: document.querySelector("#previousAddress"),
+      previousAddressField: document.querySelector("#previousAddressField"),
       plan: document.querySelector("#plan"),
       speed: document.querySelector("#speed"),
       type: document.querySelector("#type"),
       planFeeNote: document.querySelector("#planFeeNote"),
       cashoutFee: document.querySelector("#cashoutFee"),
+      cashoutFeeLabel: document.querySelector("#cashoutFeeLabel"),
       cash: document.querySelector("#cash"),
       gcash: document.querySelector("#gcash"),
       others: document.querySelector("#others"),
@@ -1622,6 +1737,7 @@
       googleMapsLink: document.querySelector("#googleMapsLink"),
       getLocationBtn: document.querySelector("#getLocationBtn"),
       saveBtn: document.querySelector("#saveBtn"),
+      saveStatus: document.querySelector("#saveStatus"),
       clearBtn: document.querySelector("#clearBtn"),
       refreshBtn: document.querySelector("#refreshBtn"),
       searchInput: document.querySelector("#searchInput"),
@@ -1703,7 +1819,124 @@
       if (!cleaned) return "";
       const num = Number(cleaned);
       if (!Number.isFinite(num)) return String(value || "");
-      return "â‚± " + num.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return "₱ " + num.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function syncRequiredLabel(control) {
+      if (!control || !control.id) return;
+      let label = fields.form.querySelector('label[for="' + control.id + '"]');
+      if (!label) {
+        const field = control.closest(".field");
+        label = field ? field.querySelector("label") : null;
+      }
+      if (label) label.classList.toggle("required-label", Boolean(control.required));
+    }
+
+    function setControlRequired(control, required) {
+      if (!control) return;
+      control.required = Boolean(required);
+      syncRequiredLabel(control);
+    }
+
+    function initializeRequiredFields() {
+      REQUIRED_FIELD_IDS.forEach(function(id) {
+        setControlRequired(document.getElementById(id), true);
+      });
+
+      if (fields.referenceLast6Digits) {
+        fields.referenceLast6Digits.pattern = "[0-9]{6}";
+        fields.referenceLast6Digits.title = "Enter the last 6 digits of the GCash reference number.";
+      }
+    }
+
+    function applyWorkTypePreset() {
+      const selectedType = String(fields.workType && fields.workType.value || "");
+      const config = WORK_TYPE_CONFIG[selectedType] || null;
+      const previousFee = Number(moneyNumber(fields.cashoutFee && fields.cashoutFee.value) || 0);
+      const currentCash = Number(moneyNumber(fields.cash && fields.cash.value) || 0);
+
+      if (config) {
+        fields.cashoutFee.value = String(config.fee);
+        fields.cashoutFeeLabel.textContent = config.feeLabel;
+        fields.workTypeNote.textContent = config.note;
+        fields.workDetails.placeholder = config.detailsPlaceholder;
+
+        if (!String(fields.cash.value || "").trim() || currentCash === previousFee) {
+          fields.cash.value = String(config.fee);
+        }
+      } else {
+        fields.cashoutFee.value = "";
+        fields.cash.value = "";
+        fields.cashoutFeeLabel.textContent = "Service / Processing Fee";
+        fields.workTypeNote.textContent = "Select the activity being reported.";
+        fields.workDetails.placeholder = "Describe the requested work, client concern, damage, repair needed, or activity at another site.";
+      }
+
+      const isRelocation = selectedType === "Relocation";
+      fields.previousAddressField.classList.toggle("is-hidden", !isRelocation);
+      setControlRequired(fields.previousAddress, isRelocation);
+      if (!isRelocation) fields.previousAddress.value = "";
+
+      updatePaymentComputation();
+      updateSaveButtonState();
+    }
+
+    function validateFormRules() {
+      const cash = Number(moneyNumber(fields.cash && fields.cash.value) || 0);
+      const gcash = Number(moneyNumber(fields.gcash && fields.gcash.value) || 0);
+      const others = Number(moneyNumber(fields.others && fields.others.value) || 0);
+      const serviceFee = Number(moneyNumber(fields.cashoutFee && fields.cashoutFee.value) || 0);
+
+      if (fields.cash) {
+        const paymentComplete = serviceFee <= 0 || cash + gcash + others > 0;
+        fields.cash.setCustomValidity(paymentComplete ? "" : "Enter at least one payment amount for this service fee.");
+      }
+      setControlRequired(fields.referenceLast6Digits, gcash > 0);
+      setControlRequired(fields.otherTermsPayment, others > 0);
+
+      const ftthStart = Number(moneyNumber(fields.ftthStart && fields.ftthStart.value) || 0);
+      const ftthEnd = Number(moneyNumber(fields.ftthEnd && fields.ftthEnd.value) || 0);
+      if (fields.ftthEnd) {
+        const hasBothFtthValues = String(fields.ftthStart.value || "").trim() && String(fields.ftthEnd.value || "").trim();
+        fields.ftthEnd.setCustomValidity(hasBothFtthValues && ftthEnd <= ftthStart ? "FTTH Used End must be greater than FTTH Used Start." : "");
+      }
+
+      const latitude = Number(fields.mapsLatitude && fields.mapsLatitude.value);
+      const longitude = Number(fields.mapsLongitude && fields.mapsLongitude.value);
+      if (fields.mapsLatitude) {
+        const validLatitude = String(fields.mapsLatitude.value || "").trim() && Number.isFinite(latitude) && latitude >= -90 && latitude <= 90;
+        fields.mapsLatitude.setCustomValidity(validLatitude ? "" : "Enter a valid latitude from -90 to 90.");
+      }
+      if (fields.mapsLongitude) {
+        const validLongitude = String(fields.mapsLongitude.value || "").trim() && Number.isFinite(longitude) && longitude >= -180 && longitude <= 180;
+        fields.mapsLongitude.setCustomValidity(validLongitude ? "" : "Enter a valid longitude from -180 to 180.");
+      }
+    }
+
+    function getInvalidControls() {
+      validateFormRules();
+      return Array.from(fields.form.elements).filter(function(control) {
+        return control.willValidate && !control.checkValidity();
+      });
+    }
+
+    function updateSaveButtonState() {
+      const invalidControls = getInvalidControls();
+      const complete = invalidControls.length === 0;
+      fields.saveBtn.disabled = isSubmitting || !complete;
+
+      if (isSubmitting) {
+        fields.saveStatus.textContent = "Saving application. Please wait...";
+        fields.saveStatus.classList.remove("is-ready");
+      } else if (complete) {
+        fields.saveStatus.textContent = "All required details are complete. You can now save the application.";
+        fields.saveStatus.classList.add("is-ready");
+      } else {
+        fields.saveStatus.textContent = "Complete all required fields to enable Save Application (" + invalidControls.length + " remaining). Use N/A if a required item does not apply.";
+        fields.saveStatus.classList.remove("is-ready");
+      }
+
+      return invalidControls;
     }
 
     function keyValue(row, names) {
@@ -1929,6 +2162,7 @@
         fields.googleMapsLink.value = "https://maps.google.com/?q=" + encodeURIComponent(lat + "," + lng);
         showNotice("Location captured.", "ok");
         fields.getLocationBtn.disabled = false;
+        updateSaveButtonState();
       }, function(error) {
         showNotice("Unable to get location. " + (error.message || "Please allow GPS permission."), "error");
         fields.getLocationBtn.disabled = false;
@@ -2089,7 +2323,18 @@
     async function saveApplication(event) {
       event.preventDefault();
 
-      fields.saveBtn.disabled = true;
+      const invalidControls = updateSaveButtonState();
+      if (invalidControls.length) {
+        fields.form.classList.add("was-validated");
+        showNotice("Please complete all required details before saving the application.", "error");
+        const firstInvalid = invalidControls[0];
+        if (firstInvalid && typeof firstInvalid.focus === "function") firstInvalid.focus();
+        if (firstInvalid && typeof firstInvalid.reportValidity === "function") firstInvalid.reportValidity();
+        return;
+      }
+
+      isSubmitting = true;
+      updateSaveButtonState();
       fields.saveBtn.textContent = "Preparing...";
 
       try {
@@ -2103,17 +2348,20 @@
           fields.form.reset();
           resetUploadNotes();
           fields.dateToday.value = todayInputValue();
+          applyWorkTypePreset();
           refreshSpeedOptions();
           updateFtthTotal();
           updatePaymentComputation();
+          fields.form.classList.remove("was-validated");
         } else {
           showNotice((response && response.message) || "Unable to save application.", "error");
         }
       } catch (error) {
         showNotice("Unable to save application. " + (error && error.message ? error.message : ""), "error");
       } finally {
-        fields.saveBtn.disabled = false;
+        isSubmitting = false;
         fields.saveBtn.textContent = "Save Application";
+        updateSaveButtonState();
       }
     }
 
@@ -2121,14 +2369,17 @@
       fields.form.reset();
       resetUploadNotes();
       fields.dateToday.value = todayInputValue();
+      applyWorkTypePreset();
       refreshSpeedOptions();
       updateFtthTotal();
       updatePaymentComputation();
+      fields.form.classList.remove("was-validated");
+      updateSaveButtonState();
       hideNotice();
     }
 
     function applicationText(row) {
-      return ["Name", "Middle Name", "Surname", "Contact No", "Account No.", "House Number", "Street Name", "Barangay", "City/Municipality", "Plan", "Speed"].map(key => row[key] || "").join(" ").toLowerCase();
+      return ["Work Type", "Work Status", "Concern / Work Report Details", "Name", "Middle Name", "Surname", "Contact No", "Account No.", "House Number", "Street Name", "Barangay", "City/Municipality", "Plan", "Speed"].map(key => row[key] || "").join(" ").toLowerCase();
     }
 
     function setMetrics(rows) {
@@ -2170,6 +2421,7 @@
       applications = [];
     }
 
+    fields.workType.addEventListener("change", applyWorkTypePreset);
     fields.plan.addEventListener("change", function() {
       refreshSpeedOptions();
       fields.speed.value = "";
@@ -2197,16 +2449,21 @@
     fields.mapsLongitude.addEventListener("input", syncMapsLink);
     fields.getLocationBtn.addEventListener("click", setCurrentLocation);
     fields.form.addEventListener("submit", saveApplication);
+    fields.form.addEventListener("input", updateSaveButtonState);
+    fields.form.addEventListener("change", updateSaveButtonState);
     fields.clearBtn.addEventListener("click", clearForm);
     if (fields.refreshBtn) fields.refreshBtn.addEventListener("click", loadApplications);
     if (fields.searchInput) fields.searchInput.addEventListener("input", renderApplications);
     
 
+    initializeRequiredFields();
     bindUploadNotes();
     setUser(loadSession());
     fields.dateToday.value = todayInputValue();
+    applyWorkTypePreset();
     refreshSpeedOptions();
     updatePaymentComputation();
+    updateSaveButtonState();
   </script>
 </body>
 </html>
