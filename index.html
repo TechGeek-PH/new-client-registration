@@ -522,11 +522,118 @@
       color: var(--ok);
     }
 
+    .existing-client-panel {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid rgba(6, 79, 131, 0.24);
+      border-radius: 10px;
+      background: #f7fbff;
+    }
+
+    .client-search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 10px;
+    }
+
+    .client-search-status {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .client-search-status.ok {
+      color: var(--ok);
+      font-weight: 800;
+    }
+
+    .client-search-status.error {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .client-search-results {
+      display: grid;
+      gap: 8px;
+    }
+
+    .client-result-btn {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      padding: 10px 12px;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .client-result-btn:hover {
+      border-color: var(--blue);
+      box-shadow: 0 4px 14px rgba(6, 79, 131, 0.08);
+    }
+
+    .client-result-btn strong,
+    .client-result-btn small {
+      display: block;
+    }
+
+    .client-result-btn small {
+      margin-top: 4px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .client-result-select {
+      color: var(--blue);
+      font-size: 0.78rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .selected-client-box {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .selected-client-summary {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #eaf7f1;
+      color: #146448;
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+
     .was-validated input:invalid,
     .was-validated select:invalid,
     .was-validated textarea:invalid {
       border-color: var(--danger);
       box-shadow: 0 0 0 2px rgba(201, 20, 72, 0.08);
+    }
+
+    @media (max-width: 780px) {
+      .client-search-row,
+      .selected-client-box {
+        grid-template-columns: 1fr;
+      }
+
+      .selected-client-summary {
+        grid-column: auto;
+      }
     }
 
     .toolbar {
@@ -1297,7 +1404,7 @@
               <h2>Client Service Application &amp; Work Report</h2>
               <p>Choose the work type, then complete the client, service, schedule, payment, photo, and location details.</p>
             </div>
-            <span class="mode-chip" id="sheetChip">Sheet: New Client</span>
+            <span class="mode-chip" id="sheetChip">Sheet: New Client / Service Reports</span>
           </div>
 
           <form id="applicationForm" class="form-wrap">
@@ -1327,6 +1434,61 @@
                     <option value="Rescheduled">Rescheduled</option>
                     <option value="Cancelled">Cancelled</option>
                   </select>
+                </div>
+
+                <div class="existing-client-panel is-hidden" id="existingClientPanel">
+                  <div class="client-search-row">
+                    <div class="field">
+                      <label for="existingClientSearch">Search Existing Client</label>
+                      <input id="existingClientSearch" autocomplete="off" placeholder="Account no., client name, phone, or address">
+                      <small>Required for Repair and Relocation. Staff use only.</small>
+                    </div>
+                    <button class="ghost-btn" type="button" id="existingClientSearchBtn">Search Client</button>
+                  </div>
+
+                  <p class="client-search-status" id="existingClientSearchStatus" role="status" aria-live="polite">Search and select the correct existing client account.</p>
+                  <div class="client-search-results" id="existingClientResults"></div>
+
+                  <div class="selected-client-box is-hidden" id="selectedClientBox">
+                    <p class="selected-client-summary" id="selectedClientSummary">No existing client selected.</p>
+
+                    <div class="field">
+                      <label for="selectedExistingAccount">Selected Account No.</label>
+                      <input id="selectedExistingAccount" name="Existing Client Account No." readonly placeholder="Select a client above">
+                    </div>
+
+                    <div class="field">
+                      <label for="accountStatusUpdate">Account Status</label>
+                      <select id="accountStatusUpdate" name="Updated Account Status">
+                        <option value="">Select account status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="For Activation">For Activation</option>
+                        <option value="For Verification">For Verification</option>
+                        <option value="Suspended">Suspended</option>
+                        <option value="Disconnected">Disconnected</option>
+                        <option value="Closed">Closed</option>
+                      </select>
+                    </div>
+
+                    <div class="field">
+                      <label for="serviceStatusUpdate">Service Status</label>
+                      <select id="serviceStatusUpdate" name="Updated Service Status">
+                        <option value="">Select service status</option>
+                        <option value="Online / Active">Online / Active</option>
+                        <option value="For Repair">For Repair</option>
+                        <option value="Under Repair">Under Repair</option>
+                        <option value="For Relocation">For Relocation</option>
+                        <option value="Relocation Scheduled">Relocation Scheduled</option>
+                        <option value="Resolved / Completed">Resolved / Completed</option>
+                        <option value="Offline / Disconnected">Offline / Disconnected</option>
+                      </select>
+                    </div>
+
+                    <input id="updateExistingClient" name="Update Existing Client" type="hidden" value="No">
+                    <input id="currentAccountStatus" name="Current Account Status" type="hidden">
+                    <input id="currentServiceStatus" name="Current Service Status" type="hidden">
+                  </div>
                 </div>
 
                 <div class="field wide is-hidden" id="previousAddressField">
@@ -1677,6 +1839,8 @@
     };
 
     let applications = [];
+    let existingClientSearchRows = [];
+    let selectedExistingClient = null;
     let isSubmitting = false;
 
     const REQUIRED_FIELD_IDS = [
@@ -1703,6 +1867,19 @@
       workDetails: document.querySelector("#workDetails"),
       previousAddress: document.querySelector("#previousAddress"),
       previousAddressField: document.querySelector("#previousAddressField"),
+      existingClientPanel: document.querySelector("#existingClientPanel"),
+      existingClientSearch: document.querySelector("#existingClientSearch"),
+      existingClientSearchBtn: document.querySelector("#existingClientSearchBtn"),
+      existingClientSearchStatus: document.querySelector("#existingClientSearchStatus"),
+      existingClientResults: document.querySelector("#existingClientResults"),
+      selectedClientBox: document.querySelector("#selectedClientBox"),
+      selectedClientSummary: document.querySelector("#selectedClientSummary"),
+      selectedExistingAccount: document.querySelector("#selectedExistingAccount"),
+      accountStatusUpdate: document.querySelector("#accountStatusUpdate"),
+      serviceStatusUpdate: document.querySelector("#serviceStatusUpdate"),
+      updateExistingClient: document.querySelector("#updateExistingClient"),
+      currentAccountStatus: document.querySelector("#currentAccountStatus"),
+      currentServiceStatus: document.querySelector("#currentServiceStatus"),
       plan: document.querySelector("#plan"),
       speed: document.querySelector("#speed"),
       type: document.querySelector("#type"),
@@ -1849,6 +2026,307 @@
       }
     }
 
+    function clientRowValue(row, names) {
+      return keyValue(row || {}, names);
+    }
+
+    function existingClientName(row) {
+      const fullName = clientRowValue(row, ["Client Name", "Full Name", "Subscriber Name"]);
+      if (fullName) return String(fullName);
+      return [
+        clientRowValue(row, ["Name", "First Name"]),
+        clientRowValue(row, ["Middle Name"]),
+        clientRowValue(row, ["Surname", "Last Name"])
+      ].filter(Boolean).join(" ");
+    }
+
+    function existingClientAccount(row) {
+      return String(clientRowValue(row, ["Account No.", "Account No", "Account Number", "Account #"]) || "").trim();
+    }
+
+    function existingClientAddress(row) {
+      return String(clientRowValue(row, ["Service Address", "Complete Address", "Address", "Installation Address"]) || "").trim();
+    }
+
+    function maskedPhone(value) {
+      const digits = String(value || "").replace(/\D/g, "");
+      if (digits.length <= 4) return digits;
+      return "••••" + digits.slice(-4);
+    }
+
+    function setClientSearchStatus(message, type) {
+      fields.existingClientSearchStatus.textContent = message;
+      fields.existingClientSearchStatus.classList.remove("ok", "error");
+      if (type) fields.existingClientSearchStatus.classList.add(type);
+    }
+
+    function extractClientRows(response) {
+      if (Array.isArray(response)) return response;
+      if (!response || typeof response !== "object") return [];
+
+      const directCandidates = [response.clients, response.rows, response.items, response.records, response.data, response.result];
+      for (const candidate of directCandidates) {
+        if (Array.isArray(candidate)) return candidate;
+        if (candidate && typeof candidate === "object") {
+          if (Array.isArray(candidate.clients)) return candidate.clients;
+          if (Array.isArray(candidate.rows)) return candidate.rows;
+          if (Array.isArray(candidate.items)) return candidate.items;
+          if (Array.isArray(candidate.records)) return candidate.records;
+        }
+      }
+      return [];
+    }
+
+    function filterExistingClientRows(rows, query) {
+      const needle = normalize(query);
+      return (rows || []).filter(function(row) {
+        const searchable = [
+          existingClientAccount(row),
+          existingClientName(row),
+          clientRowValue(row, ["Phone Number", "Contact No", "Contact Number", "Mobile Number"]),
+          existingClientAddress(row),
+          clientRowValue(row, ["RD/BLK", "Landmark"])
+        ].join(" ").toLowerCase();
+        return !needle || searchable.indexOf(needle) !== -1;
+      }).slice(0, 12);
+    }
+
+    function renderExistingClientResults(rows) {
+      existingClientSearchRows = rows || [];
+
+      if (!existingClientSearchRows.length) {
+        fields.existingClientResults.innerHTML = "";
+        setClientSearchStatus("No matching existing client was found. Check the account number, name, phone, or address.", "error");
+        return;
+      }
+
+      fields.existingClientResults.innerHTML = existingClientSearchRows.map(function(row, index) {
+        const account = existingClientAccount(row) || "No account number";
+        const name = existingClientName(row) || "Unnamed client";
+        const phone = maskedPhone(clientRowValue(row, ["Phone Number", "Contact No", "Contact Number", "Mobile Number"]));
+        const address = existingClientAddress(row) || String(clientRowValue(row, ["RD/BLK", "Landmark"]) || "No address on record");
+        const details = [phone, address].filter(Boolean).join(" · ");
+
+        return '<button class="client-result-btn" type="button" data-client-index="' + index + '">' +
+          '<span><strong>' + escapeHtml(account + " — " + name) + '</strong><small>' + escapeHtml(details) + '</small></span>' +
+          '<span class="client-result-select">Select Client</span>' +
+        '</button>';
+      }).join("");
+
+      setClientSearchStatus(existingClientSearchRows.length + " matching client" + (existingClientSearchRows.length === 1 ? "" : "s") + " found. Select the correct account.");
+    }
+
+    async function searchExistingClients() {
+      const selectedType = String(fields.workType.value || "");
+      if (selectedType !== "Repair" && selectedType !== "Relocation") return;
+
+      const query = String(fields.existingClientSearch.value || "").trim();
+      if (query.length < 4) {
+        fields.existingClientSearch.setCustomValidity("Enter at least 4 characters, then select an existing client.");
+        fields.existingClientSearch.reportValidity();
+        setClientSearchStatus("Enter at least 4 characters to search existing clients.", "error");
+        updateSaveButtonState();
+        return;
+      }
+
+      fields.existingClientSearchBtn.disabled = true;
+      fields.existingClientSearchBtn.textContent = "Searching...";
+      fields.existingClientResults.innerHTML = "";
+      setClientSearchStatus("Searching the existing client database...");
+
+      try {
+        const response = await callBackend("searchExistingClients", { query: query, search: query, limit: 20 });
+        if (response && (response.success === false || response.ok === false)) {
+          throw new Error(response.message || response.error || "Client search failed.");
+        }
+        const rows = extractClientRows(response);
+
+        renderExistingClientResults(filterExistingClientRows(rows, query));
+      } catch (error) {
+        fields.existingClientResults.innerHTML = "";
+        setClientSearchStatus("Unable to search clients. Update and redeploy Code.gs with searchExistingClients. " + (error && error.message ? error.message : ""), "error");
+      } finally {
+        fields.existingClientSearchBtn.disabled = false;
+        fields.existingClientSearchBtn.textContent = "Search Client";
+        updateSaveButtonState();
+      }
+    }
+
+    function setInputValue(id, value) {
+      const input = document.getElementById(id);
+      if (!input || value === undefined || value === null || String(value).trim() === "") return;
+      input.value = String(value);
+    }
+
+    function setSelectValue(select, value) {
+      if (!select || value === undefined || value === null || String(value).trim() === "") return;
+      const normalizedValue = String(value).trim();
+      let option = Array.from(select.options).find(function(item) {
+        return normalize(item.value) === normalize(normalizedValue) || normalize(item.textContent) === normalize(normalizedValue);
+      });
+      if (!option) {
+        option = document.createElement("option");
+        option.value = normalizedValue;
+        option.textContent = normalizedValue;
+        select.appendChild(option);
+      }
+      select.value = option.value;
+    }
+
+    function splitAndFillClientName(row) {
+      const firstName = clientRowValue(row, ["Name", "First Name"]);
+      const middleName = clientRowValue(row, ["Middle Name"]);
+      const surname = clientRowValue(row, ["Surname", "Last Name"]);
+
+      if (firstName || middleName || surname) {
+        setInputValue("name", firstName);
+        setInputValue("middleName", middleName || "N/A");
+        setInputValue("surname", surname);
+        return;
+      }
+
+      const parts = existingClientName(row).split(/\s+/).filter(Boolean);
+      if (!parts.length) return;
+      setInputValue("name", parts[0]);
+      setInputValue("surname", parts.length > 1 ? parts[parts.length - 1] : "N/A");
+      setInputValue("middleName", parts.length > 2 ? parts.slice(1, -1).join(" ") : "N/A");
+    }
+
+    function fillCoordinatesFromClient(row) {
+      let latitude = clientRowValue(row, ["Maps Latitude", "Latitude"]);
+      let longitude = clientRowValue(row, ["Maps Longitude", "Longitude"]);
+      const geo = String(clientRowValue(row, ["Geo Tagging", "Geotagging", "Coordinates"]) || "");
+      const mapsLink = String(clientRowValue(row, ["Google Maps Link", "Maps Link"]) || "");
+
+      if ((!latitude || !longitude) && geo) {
+        const geoMatch = geo.match(/(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/);
+        if (geoMatch) {
+          latitude = geoMatch[1];
+          longitude = geoMatch[2];
+        }
+      }
+
+      if ((!latitude || !longitude) && mapsLink) {
+        const linkMatch = mapsLink.match(/[?&](?:q|query)=(-?\d+(?:\.\d+)?)[,%2C\s]+(-?\d+(?:\.\d+)?)/i);
+        if (linkMatch) {
+          latitude = linkMatch[1];
+          longitude = linkMatch[2];
+        }
+      }
+
+      setInputValue("mapsLatitude", latitude);
+      setInputValue("mapsLongitude", longitude);
+      setInputValue("googleMapsLink", mapsLink);
+      syncMapsLink();
+    }
+
+    function populateFormFromExistingClient(row) {
+      const account = existingClientAccount(row);
+      const serviceAddress = existingClientAddress(row);
+      splitAndFillClientName(row);
+
+      setInputValue("contactNo", clientRowValue(row, ["Phone Number", "Contact No", "Contact Number", "Mobile Number"]));
+      setInputValue("emailAddress", clientRowValue(row, ["Email Address", "Email"]));
+      setSelectValue(document.getElementById("validIdType"), clientRowValue(row, ["Valid ID Type", "ID Type"]));
+      setInputValue("idNo", clientRowValue(row, ["ID No", "ID Number"]));
+
+      setInputValue("houseNumber", clientRowValue(row, ["House Number", "House No.", "RD/BLK"]) || (serviceAddress ? "N/A" : ""));
+      setInputValue("streetName", clientRowValue(row, ["Street Name", "Street", "Service Address", "Complete Address", "Address"]));
+      setInputValue("barangay", clientRowValue(row, ["Barangay", "Brgy"]));
+      setInputValue("cityMunicipality", clientRowValue(row, ["City/Municipality", "City", "Municipality"]));
+      setInputValue("postalCode", clientRowValue(row, ["Postal Code", "Zip Code"]));
+      setInputValue("country", clientRowValue(row, ["Country"]));
+
+      let planValue = clientRowValue(row, ["Plan", "Plan Name"]);
+      const speedValue = String(clientRowValue(row, ["Speed", "Internet Speed"]) || "").replace(/\s+/g, "");
+      if (!planValue && speedValue) {
+        const matchedPlan = PLAN_OPTIONS.find(function(item) { return normalize(item.speed) === normalize(speedValue); });
+        if (matchedPlan) planValue = matchedPlan.plan;
+      }
+      setSelectValue(fields.plan, planValue);
+      refreshSpeedOptions();
+      setSelectValue(fields.speed, speedValue);
+      const speedOption = fields.speed.options[fields.speed.selectedIndex];
+      setSelectValue(fields.type, clientRowValue(row, ["Type", "Router Type", "Connection Type"]) || (speedOption && speedOption.dataset.type));
+      setInputValue("monthlyFee", clientRowValue(row, ["Monthly Bill", "Monthly Fee", "Plan Price"]));
+
+      setInputValue("accountNo", account);
+      setInputValue("routerModel", clientRowValue(row, ["Modem Brand / Model", "Router Model", "Modem Model"]));
+      setInputValue("version", clientRowValue(row, ["Version", "Router Version"]));
+      setInputValue("serialNo", clientRowValue(row, ["Modem Serial No.", "Serial No.", "Serial Number"]));
+      setInputValue("ssid24", clientRowValue(row, ["SSID 2.4Ghz", "SSID 2.4GHz", "WiFi Name 2.4G"]));
+      setInputValue("ssid5", clientRowValue(row, ["SSID 5Ghz", "SSID 5GHz", "WiFi Name 5G"]));
+      setInputValue("password", clientRowValue(row, ["Password", "WiFi Password", "Client Password"]));
+
+      setInputValue("napNo", clientRowValue(row, ["NAP Box", "NAP No.", "NAP No"]));
+      setInputValue("lcpNo", clientRowValue(row, ["LCP No.", "LCP No", "LCP"]));
+      setSelectValue(document.getElementById("ponStatus"), clientRowValue(row, ["PON Status", "Service Status"]));
+      setInputValue("fiberCore", clientRowValue(row, ["Fiber Core", "Core"]));
+      setInputValue("napSlotNo", clientRowValue(row, ["NAP Slot #", "Line Port", "Network Port"]));
+      setInputValue("referralBy", clientRowValue(row, ["Sales Agent / Referral", "Referral By", "Sales Agent"]));
+      fillCoordinatesFromClient(row);
+
+      if (fields.workType.value === "Relocation") {
+        fields.previousAddress.value = serviceAddress || "N/A";
+      }
+
+      updatePaymentComputation();
+    }
+
+    function clearSelectedExistingClient(clearSearch, skipUpdate) {
+      selectedExistingClient = null;
+      existingClientSearchRows = [];
+      fields.selectedExistingAccount.value = "";
+      fields.accountStatusUpdate.value = "";
+      fields.serviceStatusUpdate.value = "";
+      fields.updateExistingClient.value = "No";
+      fields.currentAccountStatus.value = "";
+      fields.currentServiceStatus.value = "";
+      fields.selectedClientBox.classList.add("is-hidden");
+      fields.selectedClientSummary.textContent = "No existing client selected.";
+      fields.existingClientResults.innerHTML = "";
+      if (clearSearch) fields.existingClientSearch.value = "";
+      delete fields.existingClientSearch.dataset.selectedAccount;
+      delete fields.existingClientSearch.dataset.selectedLabel;
+      if (!skipUpdate) updateSaveButtonState();
+    }
+
+    function selectExistingClient(index) {
+      const row = existingClientSearchRows[Number(index)];
+      if (!row) return;
+
+      const account = existingClientAccount(row);
+      const name = existingClientName(row) || "Unnamed client";
+      if (!account) {
+        setClientSearchStatus("This record has no account number and cannot be selected.", "error");
+        return;
+      }
+
+      selectedExistingClient = row;
+      const selectedLabel = account + " — " + name;
+      fields.existingClientSearch.value = selectedLabel;
+      fields.existingClientSearch.dataset.selectedAccount = account;
+      fields.existingClientSearch.dataset.selectedLabel = selectedLabel;
+      fields.selectedExistingAccount.value = account;
+      fields.updateExistingClient.value = "Yes";
+      fields.selectedClientBox.classList.remove("is-hidden");
+      const currentAccountStatus = String(clientRowValue(row, ["Account Status", "Status"]) || "");
+      const currentServiceStatus = String(clientRowValue(row, ["Service Status", "Connection Status"]) || "");
+      fields.currentAccountStatus.value = currentAccountStatus;
+      fields.currentServiceStatus.value = currentServiceStatus;
+      fields.selectedClientSummary.textContent = "Selected existing client: " + selectedLabel + ". Current status: " + (currentAccountStatus || "Not set") + " / " + (currentServiceStatus || "Not set") + ". Review and edit the updated statuses below.";
+
+      setSelectValue(fields.accountStatusUpdate, currentAccountStatus);
+      setSelectValue(fields.serviceStatusUpdate, currentServiceStatus);
+      if (!fields.accountStatusUpdate.value) fields.accountStatusUpdate.value = "Active";
+      if (!fields.serviceStatusUpdate.value) fields.serviceStatusUpdate.value = fields.workType.value === "Relocation" ? "For Relocation" : "For Repair";
+
+      populateFormFromExistingClient(row);
+      fields.existingClientResults.innerHTML = "";
+      setClientSearchStatus("Existing client loaded. You may now edit the status and report details.", "ok");
+      updateSaveButtonState();
+    }
+
     function applyWorkTypePreset() {
       const selectedType = String(fields.workType && fields.workType.value || "");
       const config = WORK_TYPE_CONFIG[selectedType] || null;
@@ -1873,9 +2351,26 @@
       }
 
       const isRelocation = selectedType === "Relocation";
+      const requiresExistingClient = selectedType === "Repair" || selectedType === "Relocation";
+      fields.existingClientPanel.classList.toggle("is-hidden", !requiresExistingClient);
+      setControlRequired(fields.existingClientSearch, requiresExistingClient);
+      setControlRequired(fields.accountStatusUpdate, requiresExistingClient);
+      setControlRequired(fields.serviceStatusUpdate, requiresExistingClient);
+
+      if (!requiresExistingClient) {
+        clearSelectedExistingClient(true, true);
+        setClientSearchStatus("Search and select the correct existing client account.");
+      } else if (!selectedExistingClient) {
+        setClientSearchStatus("Search and select the existing client before completing the report.");
+      }
+
       fields.previousAddressField.classList.toggle("is-hidden", !isRelocation);
       setControlRequired(fields.previousAddress, isRelocation);
-      if (!isRelocation) fields.previousAddress.value = "";
+      if (!isRelocation) {
+        fields.previousAddress.value = "";
+      } else if (selectedExistingClient) {
+        fields.previousAddress.value = existingClientAddress(selectedExistingClient) || fields.previousAddress.value || "N/A";
+      }
 
       updatePaymentComputation();
       updateSaveButtonState();
@@ -1886,6 +2381,12 @@
       const gcash = Number(moneyNumber(fields.gcash && fields.gcash.value) || 0);
       const others = Number(moneyNumber(fields.others && fields.others.value) || 0);
       const serviceFee = Number(moneyNumber(fields.cashoutFee && fields.cashoutFee.value) || 0);
+      const requiresExistingClient = fields.workType.value === "Repair" || fields.workType.value === "Relocation";
+      const hasSelectedExistingClient = Boolean(selectedExistingClient && fields.selectedExistingAccount.value);
+
+      if (fields.existingClientSearch) {
+        fields.existingClientSearch.setCustomValidity(requiresExistingClient && !hasSelectedExistingClient ? "Search and select an existing client account." : "");
+      }
 
       if (fields.cash) {
         const paymentComplete = serviceFee <= 0 || cash + gcash + others > 0;
@@ -2019,7 +2520,7 @@
               success: true,
               ok: true,
               opaqueResponse: true,
-              message: "Application submitted. The browser could not read the Apps Script response, but the request was sent. Please check the New Client sheet."
+              message: "Application / report submitted. The browser could not read the Apps Script response, but the request was sent. Please check the reporting sheet."
             };
           }
           throw fetchError;
@@ -2340,11 +2841,11 @@
       try {
         const data = await formPayload();
         fields.saveBtn.textContent = "Saving...";
-        showNotice(data.__files && data.__files.length ? "Uploading photos and saving application..." : "Submitting registration...");
+        showNotice(data.__files && data.__files.length ? "Uploading photos and saving the application / report..." : "Submitting application / report...");
 
         const response = await callBackend("savePublicNewClientApplication", data, { usePost: true });
         if (response && (response.ok || response.success)) {
-          showNotice(response.opaqueResponse ? response.message : "Registration submitted.", "ok");
+          showNotice(response.message || "Application / report submitted.", "ok");
           fields.form.reset();
           resetUploadNotes();
           fields.dateToday.value = todayInputValue();
@@ -2422,6 +2923,24 @@
     }
 
     fields.workType.addEventListener("change", applyWorkTypePreset);
+    fields.existingClientSearchBtn.addEventListener("click", searchExistingClients);
+    fields.existingClientSearch.addEventListener("keydown", function(event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      searchExistingClients();
+    });
+    fields.existingClientSearch.addEventListener("input", function() {
+      const selectedLabel = fields.existingClientSearch.dataset.selectedLabel || "";
+      if (selectedExistingClient && fields.existingClientSearch.value !== selectedLabel) {
+        clearSelectedExistingClient(false, true);
+        setClientSearchStatus("Search again and select the correct existing client.");
+      }
+    });
+    fields.existingClientResults.addEventListener("click", function(event) {
+      const button = event.target.closest("[data-client-index]");
+      if (!button) return;
+      selectExistingClient(button.dataset.clientIndex);
+    });
     fields.plan.addEventListener("change", function() {
       refreshSpeedOptions();
       fields.speed.value = "";
