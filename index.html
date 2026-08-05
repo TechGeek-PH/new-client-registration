@@ -133,7 +133,7 @@
 
     .nav summary::-webkit-details-marker { display: none; }
     .nav summary::after {
-      content: "▾";
+      content: "â–¾";
       margin-left: auto;
       font-size: 0.78rem;
       opacity: 0.72;
@@ -951,7 +951,7 @@
     }
 
     .nav-toggle::after {
-      content: "›" !important;
+      content: "â€º" !important;
       margin-left: auto !important;
       font-size: 0.95rem !important;
       opacity: 0.75 !important;
@@ -1301,11 +1301,16 @@
             </div>
 
             <div class="section">
-              <div class="section-title"><h3>Service Details</h3><span>Plan and speed</span></div>
+              <div class="section-title"><h3>Service Details</h3><span>Plan, speed and editable promo price</span></div>
               <div class="form-grid">
                 <div class="field"><label for="plan">Plan</label><select id="plan" name="Plan" required><option value="">Select plan</option><option>Student Plan</option><option>Basic Plan</option><option>Budget Plan</option><option>Starter Plan</option><option>Family Plan</option><option>Premium Plan</option><option>Biz Plan</option></select></div>
                 <div class="field"><label for="speed">Speed</label><select id="speed" name="Speed" required><option value="">Select speed</option></select><small id="planFeeNote">Select a plan to show available speed.</small></div>
                 <div class="field"><label for="type">Type</label><select id="type" name="Type"><option value="">Select type</option><option>Single Band</option><option>Dual Band</option><option>Business</option><option>Own Router</option><option>Others</option></select></div>
+                <div class="field">
+                  <label for="monthlyFee">Monthly Fee / Promo Price</label>
+                  <input id="monthlyFee" name="Monthly Fee" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Enter promo price" required>
+                  <small id="monthlyFeeHelp">Auto-filled from the selected speed. Edit this if a promo price applies.</small>
+                </div>
                 <div class="field"><label for="ftthStart">FTTH Used Start</label><input id="ftthStart" name="FTTH Used Start" inputmode="decimal" placeholder="Meter start"></div>
                 <div class="field"><label for="ftthEnd">FTTH Used End</label><input id="ftthEnd" name="FTTH Used End" inputmode="decimal" placeholder="Meter end"></div>
                 <div class="field"><label for="ftthTotal">FTTH Total Meter</label><input id="ftthTotal" readonly placeholder="Auto compute"></div>
@@ -1377,12 +1382,7 @@
                     <input id="payProratedBill" name="Pay Prorated Bill" type="checkbox" value="Yes">
                     Include prorated bill until next 10th due date
                   </label>
-                  <p class="payment-note">Formula: Monthly Fee ÷ 30 × counted days from installation date up to next 10th due date.</p>
-                </div>
-
-                <div class="field computed-field">
-                  <label for="monthlyFee">Monthly Fee</label>
-                  <input id="monthlyFee" name="Monthly Fee" readonly placeholder="Auto from selected speed">
+                  <p class="payment-note">Formula: Monthly Fee Ã· 30 Ã— counted days from installation date up to next 10th due date.</p>
                 </div>
 
                 <div class="field computed-field">
@@ -1513,8 +1513,8 @@
                       7.1 A rebate may be granted for full-service interruptions lasting more than 24 hours.<br>
                       7.2 A written request must be submitted within 7 days from the interruption.<br>
                       7.3 Rebate calculation:<br>
-                      &nbsp;&nbsp;&nbsp;&nbsp;Monthly Fee ÷ 30 = Daily Rate<br>
-                      &nbsp;&nbsp;&nbsp;&nbsp;Daily Rate × Number of days without service<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;Monthly Fee Ã· 30 = Daily Rate<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;Daily Rate Ã— Number of days without service<br>
                       7.4 Rebates are the only form of compensation.
                     </div>
 
@@ -1703,7 +1703,7 @@
       if (!cleaned) return "";
       const num = Number(cleaned);
       if (!Number.isFinite(num)) return String(value || "");
-      return "₱ " + num.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return "â‚± " + num.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function keyValue(row, names) {
@@ -1824,7 +1824,7 @@
       if (selected.dataset.plan && !fields.plan.value) fields.plan.value = selected.dataset.plan;
       if (selected.dataset.type && !fields.type.value) fields.type.value = selected.dataset.type;
       if (fields.monthlyFee) fields.monthlyFee.value = selected.dataset.fee || "";
-      fields.planFeeNote.textContent = selected.dataset.fee ? "Standard monthly fee: " + formatMoney(selected.dataset.fee) : "";
+      fields.planFeeNote.textContent = selected.dataset.fee ? "Standard monthly fee: " + formatMoney(selected.dataset.fee) + ". You may edit the promo price." : "";
       updatePaymentComputation();
     }
 
@@ -2180,7 +2180,7 @@
     fields.speed.addEventListener("change", applySpeedPreset);
     fields.ftthStart.addEventListener("input", updateFtthTotal);
     fields.ftthEnd.addEventListener("input", updateFtthTotal);
-    [fields.cashoutFee, fields.cash, fields.gcash, fields.others, fields.dateInstalled, fields.dateToday].forEach(function(input) {
+    [fields.monthlyFee, fields.cashoutFee, fields.cash, fields.gcash, fields.others, fields.dateInstalled, fields.dateToday].forEach(function(input) {
       if (input) {
         input.addEventListener("input", updatePaymentComputation);
         input.addEventListener("change", updatePaymentComputation);
