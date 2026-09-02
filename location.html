@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Share Installation Location | TechGeekPH</title>
+  <style>
+    :root{--bg:#07111f;--card:#0d1b2d;--line:#21344d;--text:#f5f8fc;--muted:#a8b6c9;--accent:#2dd4bf;--accent2:#22c55e;--danger:#fb7185;--shadow:0 18px 50px rgba(0,0,0,.32)}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#12263f 0,#07111f 42%,#050b14 100%);color:var(--text);display:flex;align-items:center;justify-content:center;padding:20px}
+    .wrap{width:min(100%,560px)}
+    .brand{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:14px}
+    .brand img{width:52px;height:52px;object-fit:contain;border-radius:14px;background:#fff;padding:5px}
+    .brand strong{font-size:20px;letter-spacing:.2px}
+    .card{background:rgba(13,27,45,.92);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+    h1{font-size:27px;line-height:1.15;margin:0 0 10px;text-align:center}
+    .lead{color:var(--muted);text-align:center;line-height:1.55;margin:0 0 20px}
+    .notice{border:1px solid #2b4768;background:#0a1727;border-radius:16px;padding:14px 15px;color:#c7d5e8;font-size:14px;line-height:1.45;margin-bottom:18px}
+    .notice b{color:#fff}
+    label{display:block;font-size:13px;color:var(--muted);margin:0 0 7px}
+    input{width:100%;border:1px solid var(--line);background:#081523;color:#fff;border-radius:13px;padding:13px 14px;font-size:16px;outline:none;margin-bottom:16px}
+    input:focus{border-color:#3ba7a2;box-shadow:0 0 0 3px rgba(45,212,191,.12)}
+    button,a.btn{width:100%;border:0;border-radius:15px;padding:15px 16px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;transition:.15s transform,.15s opacity}
+    button:active,a.btn:active{transform:scale(.99)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .primary{background:linear-gradient(135deg,#2dd4bf,#22c55e);color:#04120e}
+    .secondary{background:#13263d;color:#fff;border:1px solid #29425f!important;margin-top:10px}
+    .ghost{background:transparent;color:#c8d6e8;border:1px solid #29425f!important;margin-top:10px}
+    .status{display:none;margin-top:18px;padding:15px;border-radius:15px;border:1px solid var(--line);background:#091727}
+    .status.show{display:block}
+    .status.ok{border-color:#246e58;background:#09231d}
+    .status.err{border-color:#7f3041;background:#281018}
+    .status .title{font-weight:800;margin-bottom:5px}
+    .status .small{font-size:13px;color:#b8c6d8;line-height:1.45}
+    .result{display:none;margin-top:18px}
+    .result.show{display:block}
+    .gps{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    .box{background:#091727;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .box span{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+    .box b{font-size:14px;word-break:break-all}
+    .map{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#081523;margin-bottom:12px}
+    .map iframe{width:100%;height:250px;border:0;display:block}
+    .privacy{margin-top:16px;text-align:center;font-size:12px;color:#8293aa;line-height:1.45}
+    .footer{text-align:center;color:#71849d;font-size:12px;margin-top:14px}
+    @media(max-width:430px){body{padding:12px}.card{padding:19px;border-radius:20px}h1{font-size:24px}.gps{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="brand">
+      <img src="assets/TechGeekPH%20-%20logo.png" alt="TechGeekPH logo" onerror="this.style.display='none'" />
+      <strong>TechGeekPH</strong>
+    </div>
+
+    <section class="card">
+      <h1>📍 Share Installation Location</h1>
+      <p class="lead">Para madaling mahanap ng technician ang inyong bahay, kunin ang location habang nasa mismong installation address.</p>
+
+      <div class="notice"><b>Important:</b> I-on ang Location/GPS ng phone at pindutin ang <b>Allow</b> kapag humingi ng location permission.</div>
+
+      <label for="clientName">Client name <span style="opacity:.7">(optional)</span></label>
+      <input id="clientName" autocomplete="name" placeholder="Hal. Juan Dela Cruz" />
+
+      <button id="locateBtn" class="primary" type="button">📍 GET MY CURRENT LOCATION</button>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+
+      <div id="result" class="result">
+        <div class="gps">
+          <div class="box"><span>Latitude / Longitude</span><b id="coords">—</b></div>
+          <div class="box"><span>GPS accuracy</span><b id="accuracy">—</b></div>
+        </div>
+
+        <div class="map"><iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Current location map"></iframe></div>
+
+        <button id="shareBtn" class="primary" type="button">💬 SEND LOCATION TO MESSENGER</button>
+        <button id="copyBtn" class="secondary" type="button">🔗 COPY GOOGLE MAPS LINK</button>
+        <a id="mapsBtn" class="btn ghost" target="_blank" rel="noopener">🗺️ OPEN IN GOOGLE MAPS</a>
+      </div>
+
+      <p class="privacy">Your location is only accessed after you tap the location button and approve the browser permission. This page does not continuously track your device.</p>
+    </section>
+    <div class="footer">TechGeekPH Solutions &amp; Services Inc.</div>
+  </main>
+
+<script>
+(() => {
+  const locateBtn = document.getElementById('locateBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const mapsBtn = document.getElementById('mapsBtn');
+  const statusEl = document.getElementById('status');
+  const resultEl = document.getElementById('result');
+  const coordsEl = document.getElementById('coords');
+  const accuracyEl = document.getElementById('accuracy');
+  const mapFrame = document.getElementById('mapFrame');
+  const clientNameInput = document.getElementById('clientName');
+
+  const params = new URLSearchParams(location.search);
+  const prefillName = params.get('name') || '';
+  const ticket = params.get('ticket') || '';
+  const account = params.get('account') || '';
+  if (prefillName) clientNameInput.value = prefillName;
+
+  let current = null;
+
+  function setStatus(kind, title, detail) {
+    statusEl.className = 'status show ' + (kind || '');
+    statusEl.innerHTML = `<div class="title">${title}</div><div class="small">${detail || ''}</div>`;
+  }
+
+  function locationText() {
+    if (!current) return '';
+    const name = clientNameInput.value.trim();
+    const parts = ['📍 TechGeekPH Installation Location'];
+    if (name) parts.push('Client: ' + name);
+    if (account) parts.push('Account: ' + account);
+    if (ticket) parts.push('Ticket: ' + ticket);
+    parts.push('Google Maps: ' + current.mapsUrl);
+    parts.push('GPS Accuracy: ±' + Math.round(current.accuracy) + ' meters');
+    return parts.join('\n');
+  }
+
+  function locate() {
+    if (!navigator.geolocation) {
+      setStatus('err','Location not supported','Hindi supported ng browser na ito ang GPS location. Subukan sa Chrome, Safari, o ibang updated browser.');
+      return;
+    }
+
+    locateBtn.disabled = true;
+    locateBtn.textContent = '⏳ GETTING YOUR LOCATION…';
+    resultEl.classList.remove('show');
+    setStatus('', 'Getting your GPS location…', 'Hintayin nang ilang segundo at pindutin ang Allow kung may location permission prompt.');
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const lat = Number(pos.coords.latitude.toFixed(7));
+        const lng = Number(pos.coords.longitude.toFixed(7));
+        const accuracy = pos.coords.accuracy || 0;
+        const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        current = {lat,lng,accuracy,mapsUrl};
+
+        coordsEl.textContent = `${lat}, ${lng}`;
+        accuracyEl.textContent = `±${Math.round(accuracy)} meters`;
+        mapsBtn.href = mapsUrl;
+        mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=18&output=embed`;
+        resultEl.classList.add('show');
+
+        let note = 'Location ready. Pindutin ang SEND LOCATION TO MESSENGER.';
+        if (accuracy > 50) note += ' Mahina ang GPS accuracy; lumapit sa bintana o labas at pindutin ulit ang Get Location para mas accurate.';
+        setStatus('ok','✅ Location found',note);
+      },
+      err => {
+        let message = 'Hindi nakuha ang location.';
+        if (err.code === 1) message = 'Location permission was denied. Sa browser settings, i-Allow ang Location para sa page na ito, pagkatapos subukan ulit.';
+        if (err.code === 2) message = 'Hindi ma-detect ang GPS location. I-on ang Location/GPS at mobile data o Wi‑Fi, pagkatapos subukan ulit.';
+        if (err.code === 3) message = 'Nag-timeout ang GPS. Subukan ulit habang nasa open area o malapit sa bintana.';
+        setStatus('err','⚠️ Location unavailable',message);
+      },
+      {enableHighAccuracy:true,timeout:20000,maximumAge:0}
+    );
+
+    setTimeout(() => {
+      locateBtn.disabled = false;
+      locateBtn.textContent = '📍 GET MY CURRENT LOCATION';
+    }, 2500);
+  }
+
+  async function shareLocation() {
+    if (!current) return;
+    const text = locationText();
+
+    if (navigator.share) {
+      try {
+        await navigator.share({title:'TechGeekPH Installation Location', text, url: current.mapsUrl});
+        setStatus('ok','✅ Share menu opened','Piliin ang Messenger at i-send sa TechGeekPH conversation.');
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus('ok','✅ Location copied','Na-copy na ang location. Buksan ang Messenger at i-paste sa TechGeekPH conversation.');
+      setTimeout(() => { window.open('https://www.messenger.com/', '_blank', 'noopener'); }, 500);
+    } catch (e) {
+      window.prompt('Copy this location and send it to TechGeekPH Messenger:', text);
+    }
+  }
+
+  async function copyLink() {
+    if (!current) return;
+    try {
+      await navigator.clipboard.writeText(current.mapsUrl);
+      setStatus('ok','✅ Google Maps link copied','I-paste ang link sa Messenger para ma-send sa TechGeekPH.');
+    } catch (e) {
+      window.prompt('Copy this Google Maps link:', current.mapsUrl);
+    }
+  }
+
+  locateBtn.addEventListener('click', locate);
+  shareBtn.addEventListener('click', shareLocation);
+  copyBtn.addEventListener('click', copyLink);
+})();
+</script>
+</body>
+</html>
