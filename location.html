@@ -1,66 +1,58 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1220" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
   <title>New Installation Request | TechGeekPH</title>
   <style>
-    :root{--bg:#07111f;--card:#0d1b2d;--line:#21344d;--text:#f5f8fc;--muted:#a8b6c9;--accent:#2dd4bf;--accent2:#22c55e;--danger:#fb7185;--warn:#fbbf24;--shadow:0 18px 50px rgba(0,0,0,.32)}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#12263f 0,#07111f 42%,#050b14 100%);color:var(--text);display:flex;align-items:flex-start;justify-content:center;padding:20px}.wrap{width:min(100%,620px)}.brand{display:flex;align-items:center;gap:12px;justify-content:center;margin:4px 0 14px}.brand img{width:52px;height:52px;object-fit:contain;border-radius:14px;background:#fff;padding:5px}.brand strong{font-size:20px}.card{background:rgba(13,27,45,.94);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}h1{font-size:27px;line-height:1.15;margin:0 0 10px;text-align:center}.lead{color:var(--muted);text-align:center;line-height:1.55;margin:0 0 20px}.section-title{font-weight:850;margin:20px 0 10px;font-size:16px}.required{color:#fb7185}label{display:block;font-size:13px;color:var(--muted);margin:0 0 7px}input{width:100%;border:1px solid var(--line);background:#081523;color:#fff;border-radius:13px;padding:13px 14px;font-size:16px;outline:none;margin-bottom:14px}input:focus{border-color:#3ba7a2;box-shadow:0 0 0 3px rgba(45,212,191,.12)}.plans{display:grid;gap:9px;margin-bottom:14px}.plan{border:1px solid var(--line);background:#091727;border-radius:14px;padding:12px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer}.plan input{width:auto;margin:3px 0 0}.plan strong{display:block;color:#fff}.plan span{display:block;color:var(--muted);font-size:13px;margin-top:2px}.cashout{background:#10273b;border:1px solid #2a4b67;border-radius:14px;padding:12px 14px;margin:10px 0 18px;font-weight:850;text-align:center}.notice{border:1px solid #2b4768;background:#0a1727;border-radius:16px;padding:14px 15px;color:#c7d5e8;font-size:14px;line-height:1.5;margin-bottom:14px}.notice b{color:#fff}button,a.btn{width:100%;border:0;border-radius:15px;padding:15px 16px;font-size:16px;font-weight:850;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;text-decoration:none}.primary{background:linear-gradient(135deg,#2dd4bf,#22c55e);color:#04120e}.primary:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#13263d;color:#fff;border:1px solid #29425f!important;margin-top:10px}.status{display:none;margin-top:16px;padding:15px;border-radius:15px;border:1px solid var(--line);background:#091727}.status.show{display:block}.status.ok{border-color:#246e58;background:#09231d}.status.err{border-color:#7f3041;background:#281018}.status.warn{border-color:#79651f;background:#2a2308}.status .title{font-weight:850;margin-bottom:5px}.status .small{font-size:13px;color:#c3cfdf;line-height:1.5}.location-result{display:none;margin-top:16px}.location-result.show{display:block}.gps{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.box{background:#091727;border:1px solid var(--line);border-radius:14px;padding:12px}.box span{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.box b{font-size:14px;word-break:break-all}.map{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#081523;margin-bottom:12px}.map iframe{width:100%;height:240px;border:0;display:block}.submit-wrap{display:none;margin-top:12px}.submit-wrap.show{display:block}.submit-note{text-align:center;color:#91a3ba;font-size:12px;line-height:1.45;margin:10px 4px 0}.success{display:none;text-align:center}.success.show{display:block}.success-icon{font-size:54px;margin:2px 0 8px}.success h2{margin:0 0 8px;font-size:24px}.ticket-box{margin:18px 0;background:#071723;border:1px solid #2b7660;border-radius:18px;padding:18px}.ticket-box span{display:block;color:#9fb0c5;font-size:13px}.ticket-box strong{display:block;margin-top:6px;font-size:28px;color:#5ee0ba;letter-spacing:.6px;word-break:break-word}.queue-msg{background:#102238;border:1px solid #294762;border-radius:16px;padding:15px;text-align:left;line-height:1.55;color:#dce5f1;font-size:14px}.queue-msg b{color:#fff}.privacy{margin-top:16px;text-align:center;font-size:12px;color:#8293aa;line-height:1.45}.footer{text-align:center;color:#71849d;font-size:12px;margin-top:14px}@media(max-width:430px){body{padding:12px}.card{padding:19px;border-radius:20px}h1{font-size:24px}.gps{grid-template-columns:1fr}.ticket-box strong{font-size:23px}}
+    :root{--bg:#07111f;--card:#0d1b2d;--line:#21344d;--text:#f5f8fc;--muted:#9fb0c5;--ok:#22c55e;--teal:#2dd4bf;--danger:#fb7185;--shadow:0 18px 50px rgba(0,0,0,.32);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#12263f 0,#07111f 45%,#050b14 100%);color:var(--text);padding:18px}.wrap{width:min(620px,100%);margin:auto}.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin:3px 0 14px}.brand img{width:52px;height:52px;object-fit:contain;padding:5px;border-radius:13px;background:#fff}.brand strong{font-size:20px}.card{background:rgba(13,27,45,.95);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}h1{margin:0;text-align:center;font-size:27px}.lead{margin:9px 0 20px;text-align:center;color:var(--muted);font-size:14px;line-height:1.55}.section{margin:20px 0 10px;font-weight:900}.req{color:var(--danger)}label.field-label{display:block;margin:0 0 6px;color:var(--muted);font-size:13px}.text-input{width:100%;min-height:48px;margin:0 0 13px;border:1px solid var(--line);border-radius:13px;background:#081523;color:#fff;padding:0 13px;font-size:16px;outline:none}.text-input:focus{border-color:#3ba7a2;box-shadow:0 0 0 3px rgba(45,212,191,.12)}.plans{display:grid;gap:9px}.plan{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:13px;background:#091727;cursor:pointer}.plan input{width:18px;height:18px;margin-top:2px}.plan b{display:block}.plan span span{display:block;margin-top:3px;color:var(--muted);font-size:12px}.cashout{margin:13px 0 18px;padding:12px;border:1px solid #2a4b67;border-radius:13px;background:#10273b;text-align:center;font-weight:900}.notice{margin:12px 0;padding:13px 14px;border:1px solid #2b4768;border-radius:14px;background:#0a1727;color:#c7d5e8;font-size:13px;line-height:1.5}.notice b{color:#fff}button{width:100%;min-height:50px;border:0;border-radius:14px;font:inherit;font-size:15px;font-weight:900;cursor:pointer}.primary{background:linear-gradient(135deg,var(--teal),var(--ok));color:#04120e}.secondary{margin-top:10px;border:1px solid #29425f;background:#13263d;color:#fff}.primary:disabled,.secondary:disabled{opacity:.55;cursor:not-allowed}.status{display:none;margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#091727}.status.show{display:block}.status.ok{border-color:#246e58;background:#09231d}.status.err{border-color:#7f3041;background:#281018}.status .title{font-weight:900}.status .small{margin-top:5px;color:#c3cfdf;font-size:13px;line-height:1.5}.location-result,.submit-wrap{display:none;margin-top:14px}.location-result.show,.submit-wrap.show{display:block}.gps{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}.box{padding:11px;border:1px solid var(--line);border-radius:13px;background:#091727}.box span{display:block;color:var(--muted);font-size:11px}.box b{display:block;margin-top:4px;font-size:13px;word-break:break-word}.map{overflow:hidden;border:1px solid var(--line);border-radius:15px;background:#081523}.map iframe{display:block;width:100%;height:240px;border:0}.submit-note{margin:9px 0 0;text-align:center;color:#91a3ba;font-size:11px}.success{display:none;text-align:center}.success.show{display:block}.success-icon{font-size:52px}.success h2{margin:7px 0 5px}.ticket-box{margin:17px 0;padding:18px;border:1px solid #2b7660;border-radius:17px;background:#071723}.ticket-box span{display:block;color:var(--muted);font-size:12px}.ticket-box strong{display:block;margin-top:7px;color:#5ee0ba;font-size:25px;word-break:break-word}.queue-msg{padding:15px;border:1px solid #294762;border-radius:15px;background:#102238;text-align:left;color:#dce5f1;font-size:14px;line-height:1.55}.queue-msg b{color:#fff}.privacy,.footer{color:#8293aa;text-align:center;font-size:11px;line-height:1.5}.privacy{margin-top:16px}.footer{margin-top:13px}@media(max-width:430px){body{padding:11px}.card{padding:18px;border-radius:20px}h1{font-size:23px}.gps{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
 <main class="wrap">
-  <div class="brand"><img src="assets/TechGeekPH%20-%20logo.png" alt="TechGeekPH logo" onerror="this.style.display='none'" /><strong>TechGeekPH</strong></div>
-
-  <section id="formCard" class="card">
+  <div class="brand"><img src="assets/TechGeekPH%20-%20logo.png" alt="TechGeekPH" onerror="this.style.display='none'"><strong>TechGeekPH</strong></div>
+  <section class="card">
     <div id="formContent">
       <h1>📡 New Installation Request</h1>
       <p class="lead">Hi po! 😊 Para ma-check namin ang coverage at ma-line up ang inyong installation, pakicomplete ang details at kunin ang exact GPS location habang nasa mismong installation address.</p>
 
-      <div class="section-title">Client Details</div>
-      <label for="clientName">Name <span class="required">*</span></label>
-      <input id="clientName" autocomplete="name" placeholder="Juan Dela Cruz" />
+      <div class="section">Client Details</div>
+      <label class="field-label" for="clientName">Name <span class="req">*</span></label>
+      <input class="text-input" id="clientName" autocomplete="name" placeholder="Juan Dela Cruz">
+      <label class="field-label" for="contact">Contact Number <span class="req">*</span></label>
+      <input class="text-input" id="contact" inputmode="tel" autocomplete="tel" placeholder="09XXXXXXXXX">
+      <label class="field-label" for="address">Complete Address <span class="req">*</span></label>
+      <input class="text-input" id="address" autocomplete="street-address" placeholder="House No., Street, Purok/Block, Barangay">
+      <label class="field-label" for="landmark">Nearest Landmark <span class="req">*</span></label>
+      <input class="text-input" id="landmark" placeholder="Hal. tapat ng blue store / near covered court">
 
-      <label for="contact">Contact Number <span class="required">*</span></label>
-      <input id="contact" inputmode="tel" autocomplete="tel" placeholder="09XXXXXXXXX" />
-
-      <label for="address">Complete Address <span class="required">*</span></label>
-      <input id="address" autocomplete="street-address" placeholder="House No., Street, Purok/Block, Barangay" />
-
-      <label for="landmark">Nearest Landmark <span class="required">*</span></label>
-      <input id="landmark" placeholder="Hal. tapat ng blue store / near covered court" />
-
-      <div class="section-title">Preferred Plan <span class="required">*</span></div>
+      <div class="section">Preferred Plan <span class="req">*</span></div>
       <div class="plans">
-        <label class="plan"><input type="radio" name="plan" value="₱799/month – up to 100 Mbps"><span><strong>₱799/month</strong><span>up to 100 Mbps</span></span></label>
-        <label class="plan"><input type="radio" name="plan" value="₱999/month – up to 150 Mbps"><span><strong>₱999/month</strong><span>up to 150 Mbps</span></span></label>
-        <label class="plan"><input type="radio" name="plan" value="₱1,499/month – up to 200 Mbps"><span><strong>₱1,499/month</strong><span>up to 200 Mbps</span></span></label>
-        <label class="plan"><input type="radio" name="plan" value="₱1,999/month – up to 300 Mbps"><span><strong>₱1,999/month</strong><span>up to 300 Mbps</span></span></label>
-        <label class="plan"><input type="radio" name="plan" value="Biz Plan ₱1,599/month – up to 200 Mbps"><span><strong>Biz Plan ₱1,599/month</strong><span>up to 200 Mbps</span></span></label>
+        <label class="plan"><input type="radio" name="plan" value="₱799/month – up to 100 Mbps"><span><b>₱799/month</b><span>up to 100 Mbps</span></span></label>
+        <label class="plan"><input type="radio" name="plan" value="₱999/month – up to 150 Mbps"><span><b>₱999/month</b><span>up to 150 Mbps</span></span></label>
+        <label class="plan"><input type="radio" name="plan" value="₱1,499/month – up to 200 Mbps"><span><b>₱1,499/month</b><span>up to 200 Mbps</span></span></label>
+        <label class="plan"><input type="radio" name="plan" value="₱1,999/month – up to 300 Mbps"><span><b>₱1,999/month</b><span>up to 300 Mbps</span></span></label>
+        <label class="plan"><input type="radio" name="plan" value="Biz Plan ₱1,599/month – up to 200 Mbps"><span><b>Biz Plan ₱1,599/month</b><span>up to 200 Mbps</span></span></label>
       </div>
       <div class="cashout">Cashout / Activation Fee: ₱800 only</div>
 
-      <div class="notice"><b>Step 1 — Get your location:</b> I-on ang Location/GPS ng phone. Pindutin ang button habang nasa mismong bahay o installation address at piliin ang <b>Allow</b> kapag humingi ng location permission.</div>
+      <div class="notice"><b>Step 1 — Get your location:</b> I-on ang Location/GPS ng phone. Pindutin ang button habang nasa mismong bahay o installation address at piliin ang <b>Allow</b>.</div>
       <button id="locateBtn" class="primary" type="button">📍 GET MY CURRENT LOCATION</button>
       <div id="status" class="status" role="status" aria-live="polite"></div>
 
       <div id="locationResult" class="location-result">
-        <div class="gps">
-          <div class="box"><span>Latitude / Longitude</span><b id="coords">—</b></div>
-          <div class="box"><span>GPS Accuracy</span><b id="accuracy">—</b></div>
-        </div>
-        <div class="map"><iframe id="mapFrame" loading="lazy" title="Current location map"></iframe></div>
+        <div class="gps"><div class="box"><span>Latitude / Longitude</span><b id="coords">—</b></div><div class="box"><span>GPS Accuracy</span><b id="accuracy">—</b></div></div>
+        <div class="map"><iframe id="mapFrame" loading="lazy" title="Installation location"></iframe></div>
         <button id="updateLocationBtn" class="secondary" type="button">📍 UPDATE LOCATION</button>
       </div>
 
       <div id="submitWrap" class="submit-wrap">
-        <div class="notice"><b>Step 2 — Submit:</b> I-check muna ang details at location. Pag pinindot ang Submit, gagawa ang system ng installation ticket at ila-line up ang request ninyo.</div>
+        <div class="notice"><b>Step 2 — Submit:</b> I-check muna ang details at location. Pag pinindot ang Submit, automatic na gagawa ng ticket sa TechGeekPH Technician Tickets app at ila-line up ang request ninyo.</div>
         <button id="submitBtn" class="primary" type="button">✅ SUBMIT APPLICATION</button>
         <p class="submit-note">Please tap Submit only once. Huwag i-close ang page habang ginagawa ang ticket.</p>
       </div>
-
       <p class="privacy">Your GPS location is accessed only after you approve browser permission. TechGeekPH does not continuously track your device.</p>
     </div>
 
@@ -69,160 +61,71 @@
       <h2>Application Submitted</h2>
       <p class="lead">Na-receive na po namin ang inyong installation request.</p>
       <div class="ticket-box"><span>Your Installation Ticket Number</span><strong id="ticketNumber">—</strong></div>
-      <div class="queue-msg">
-        <b>Your request is now lined up for installation.</b><br><br>
-        Please keep your phone available and wait for a <b>call or text from our technician</b>. We kindly ask for your patience because we cannot provide an exact installation date. Our installation schedule may change depending on urgent repair concerns, and <b>repair requests are always prioritized</b> to restore service to affected clients as soon as possible.<br><br>
-        Thank you for your patience and understanding. Please keep your ticket number for reference.
-      </div>
+      <div class="queue-msg"><b>Your request is now lined up for installation.</b><br><br>Please keep your phone available and wait for a <b>call or text from our technician</b>. Please be patient po because we cannot provide an exact installation date. The installation schedule depends on our current field workload, and <b>repair concerns are always prioritized</b> so we can restore service to affected clients first.<br><br>Thank you for your patience and understanding. Please keep your ticket number for reference.</div>
     </div>
   </section>
   <div class="footer">TechGeekPH Solutions &amp; Services Inc.</div>
 </main>
-
 <script>
 (() => {
-  const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxDY5TsonrB58YaN8LGbrrrc_ZD1QVpF1WK0p6jToIR2FBSqGaHfsgaE1CCiH1MvukV/exec';
-  const $ = id => document.getElementById(id);
-  const clientName=$('clientName'), contact=$('contact'), address=$('address'), landmark=$('landmark');
-  const locateBtn=$('locateBtn'), updateLocationBtn=$('updateLocationBtn'), submitBtn=$('submitBtn');
-  const statusEl=$('status'), locationResult=$('locationResult'), submitWrap=$('submitWrap'), coords=$('coords'), accuracy=$('accuracy'), mapFrame=$('mapFrame');
-  const formContent=$('formContent'), successContent=$('successContent'), ticketNumber=$('ticketNumber');
-  let current=null;
-  let requestId='';
-  let submitting=false;
-
+  'use strict';
+  const SUPABASE_URL='https://tcexzfztdgximrzuosqs.supabase.co';
+  const SUPABASE_KEY='sb_publishable_8H8_S7NTWvzPCLvYUe2C4g_k3Ltjfiz';
+  const RPC_URL=SUPABASE_URL+'/rest/v1/rpc/public_create_installation_ticket';
+  const REQUEST_KEY='tg_public_install_request_id';
+  const $=id=>document.getElementById(id);
+  const clientName=$('clientName'),contact=$('contact'),address=$('address'),landmark=$('landmark');
+  const locateBtn=$('locateBtn'),updateLocationBtn=$('updateLocationBtn'),submitBtn=$('submitBtn');
+  const statusEl=$('status'),locationResult=$('locationResult'),submitWrap=$('submitWrap'),coords=$('coords'),accuracy=$('accuracy'),mapFrame=$('mapFrame');
+  const formContent=$('formContent'),successContent=$('successContent'),ticketNumber=$('ticketNumber');
+  let current=null,submitting=false;
   const params=new URLSearchParams(location.search);
-  if(params.get('name')) clientName.value=params.get('name');
-  if(params.get('contact')) contact.value=params.get('contact');
+  if(params.get('name'))clientName.value=params.get('name');
+  if(params.get('contact'))contact.value=params.get('contact');
 
-  function setStatus(kind,title,detail){
-    statusEl.className='status show '+(kind||'');
-    statusEl.innerHTML='<div class="title">'+escapeHtml(title)+'</div><div class="small">'+escapeHtml(detail||'')+'</div>';
-  }
-  function escapeHtml(v){return String(v||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+  function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function setStatus(kind,title,detail){statusEl.className='status show '+(kind||'');statusEl.innerHTML='<div class="title">'+esc(title)+'</div><div class="small">'+esc(detail||'')+'</div>';}
   function selectedPlan(){const el=document.querySelector('input[name="plan"]:checked');return el?el.value:'';}
-  function createRequestId(){
-    if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
-    return 'REQ-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
-  }
-  function validate(){
-    const missing=[];
-    if(!clientName.value.trim())missing.push('Name');
-    if(!contact.value.trim())missing.push('Contact Number');
-    if(!address.value.trim())missing.push('Complete Address');
-    if(!landmark.value.trim())missing.push('Nearest Landmark');
-    if(!selectedPlan())missing.push('Preferred Plan');
-    if(!current)missing.push('GPS Location');
-    if(missing.length){setStatus('err','⚠️ Please complete the required details',missing.join(', '));return false;}
-    const digits=contact.value.replace(/\D/g,'');
-    if(digits.length<10||digits.length>12){setStatus('err','⚠️ Check Contact Number','Please enter a valid Philippine mobile number.');return false;}
-    return true;
-  }
+  function newRequestId(){if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();return 'REQ-'+Date.now()+'-'+Math.random().toString(36).slice(2,12);}
+  function requestId(){let id='';try{id=sessionStorage.getItem(REQUEST_KEY)||'';}catch(_){ }if(!id){id=newRequestId();try{sessionStorage.setItem(REQUEST_KEY,id);}catch(_){ }}return id;}
+  function validate(){const missing=[];if(!clientName.value.trim())missing.push('Name');if(!contact.value.trim())missing.push('Contact Number');if(!address.value.trim())missing.push('Complete Address');if(!landmark.value.trim())missing.push('Nearest Landmark');if(!selectedPlan())missing.push('Preferred Plan');if(!current)missing.push('GPS Location');if(missing.length){setStatus('err','⚠️ Please complete the required details',missing.join(', '));return false;}const digits=contact.value.replace(/\D/g,'');if(digits.length<10||digits.length>13){setStatus('err','⚠️ Check Contact Number','Please enter a valid Philippine mobile number.');return false;}return true;}
+
   function locate(){
     if(!navigator.geolocation){setStatus('err','Location not supported','Please use an updated Chrome, Safari, or mobile browser.');return;}
     locateBtn.disabled=true;updateLocationBtn.disabled=true;submitWrap.classList.remove('show');
     setStatus('','Getting your GPS location…','Pindutin ang Allow kapag humingi ng location permission.');
     navigator.geolocation.getCurrentPosition(pos=>{
-      const lat=Number(pos.coords.latitude.toFixed(7));
-      const lng=Number(pos.coords.longitude.toFixed(7));
-      const acc=pos.coords.accuracy||0;
-      current={lat,lng,accuracy:acc,mapsUrl:`https://www.google.com/maps?q=${lat},${lng}`};
-      coords.textContent=`${lat}, ${lng}`;
-      accuracy.textContent=`±${Math.round(acc)} meters`;
-      mapFrame.src=`https://maps.google.com/maps?q=${lat},${lng}&z=18&output=embed`;
-      locationResult.classList.add('show');
-      submitWrap.classList.add('show');
+      const lat=Number(pos.coords.latitude.toFixed(7)),lng=Number(pos.coords.longitude.toFixed(7)),acc=Number(pos.coords.accuracy||0);
+      current={lat,lng,accuracy:acc,mapsUrl:'https://www.google.com/maps?q='+lat+','+lng};
+      coords.textContent=lat+', '+lng;accuracy.textContent='±'+Math.round(acc)+' meters';
+      mapFrame.src='https://maps.google.com/maps?q='+lat+','+lng+'&z=18&output=embed';
+      locationResult.classList.add('show');submitWrap.classList.add('show');
       setStatus('ok','✅ Location found','Location is ready. Review your details, then tap SUBMIT APPLICATION below.');
       locateBtn.textContent='✅ LOCATION READY';locateBtn.disabled=true;updateLocationBtn.disabled=false;
       setTimeout(()=>submitWrap.scrollIntoView({behavior:'smooth',block:'center'}),200);
     },err=>{
-      let m='Hindi nakuha ang location.';
-      if(err.code===1)m='Location permission denied. I-Allow ang Location sa browser settings at subukan ulit.';
-      if(err.code===2)m='I-on ang Location/GPS at mobile data o Wi-Fi, pagkatapos subukan ulit.';
-      if(err.code===3)m='Nag-timeout ang GPS. Subukan ulit sa open area o malapit sa bintana.';
-      setStatus('err','⚠️ Location unavailable',m);locateBtn.disabled=false;updateLocationBtn.disabled=false;
+      let msg='Hindi nakuha ang location.';if(err.code===1)msg='Location permission denied. I-Allow ang Location sa browser settings at subukan ulit.';if(err.code===2)msg='I-on ang Location/GPS at mobile data o Wi-Fi, pagkatapos subukan ulit.';if(err.code===3)msg='Nag-timeout ang GPS. Subukan ulit sa open area o malapit sa bintana.';
+      setStatus('err','⚠️ Location unavailable',msg);locateBtn.disabled=false;updateLocationBtn.disabled=false;
     },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
   }
 
-  function payload(){
-    requestId=requestId||createRequestId();
-    return {
-      action:'publicCreateInstallationTicket',
-      method:'publicCreateInstallationTicket',
-      requestId,
-      clientName:clientName.value.trim(),
-      contactNumber:contact.value.trim(),
-      address:address.value.trim(),
-      landmark:landmark.value.trim(),
-      preferredPlan:selectedPlan(),
-      cashout:800,
-      latitude:current.lat,
-      longitude:current.lng,
-      googleMapsLink:current.mapsUrl,
-      gpsAccuracy:Math.round(current.accuracy),
-      ticketType:'Installation',
-      priority:'Normal',
-      status:'Pending',
-      source:'PUBLIC_INSTALLATION_PAGE'
-    };
-  }
-
-  async function postTicket(data){
-    try{
-      const res=await fetch(BACKEND_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});
-      const text=await res.text();
-      try{return JSON.parse(text);}catch(e){return {ok:false,message:'Invalid backend response'};}
-    }catch(e){
-      await fetch(BACKEND_URL,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});
-      return {ok:true,opaque:true};
-    }
-  }
-
-  function jsonpStatus(id){
-    return new Promise((resolve,reject)=>{
-      const cb='tgTicketCb_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-      const script=document.createElement('script');
-      const timer=setTimeout(()=>cleanup(new Error('timeout')),7000);
-      function cleanup(err,data){clearTimeout(timer);try{delete window[cb];}catch(e){}script.remove();err?reject(err):resolve(data);}
-      window[cb]=data=>cleanup(null,data);
-      script.onerror=()=>cleanup(new Error('status lookup failed'));
-      script.src=BACKEND_URL+'?action=getPublicInstallationTicketStatus&requestId='+encodeURIComponent(id)+'&callback='+encodeURIComponent(cb)+'&_='+Date.now();
-      document.head.appendChild(script);
-    });
-  }
-
-  async function waitForTicket(id,initial){
-    const fromInitial=initial&&(initial.ticketId||initial.ticketNo||initial.id||(initial.data&&initial.data.TicketID));
-    if(fromInitial)return String(fromInitial);
-    for(let i=0;i<12;i++){
-      await new Promise(r=>setTimeout(r,i===0?700:1200));
-      try{
-        const s=await jsonpStatus(id);
-        const ticket=s&&(s.ticketId||s.ticketNo||s.id||(s.data&&s.data.TicketID));
-        if(ticket)return String(ticket);
-        if(s&&s.success===false&&s.code&&s.code!=='PENDING')throw new Error(s.message||s.code);
-      }catch(e){if(i===11)throw e;}
-    }
-    throw new Error('Ticket creation is taking longer than expected.');
+  async function createTicket(){
+    const body={p_request_id:requestId(),p_client_name:clientName.value.trim(),p_contact_number:contact.value.trim(),p_address:address.value.trim(),p_landmark:landmark.value.trim(),p_preferred_plan:selectedPlan(),p_google_maps_link:current.mapsUrl,p_latitude:current.lat,p_longitude:current.lng,p_gps_accuracy:Math.round(current.accuracy)};
+    const res=await fetch(RPC_URL,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body)});
+    const text=await res.text();let data=null;try{data=text?JSON.parse(text):null;}catch(_){data=null;}
+    if(!res.ok)throw new Error(data&&data.message?data.message:'Unable to create ticket.');
+    if(!data||data.ok!==true||!data.ticket_no)throw new Error('Ticket number was not returned. Please try again.');
+    return data;
   }
 
   async function submit(){
     if(submitting||!validate())return;
-    submitting=true;submitBtn.disabled=true;submitBtn.textContent='⏳ CREATING YOUR TICKET…';
-    setStatus('','Submitting application…','Please wait and do not close this page.');
+    submitting=true;submitBtn.disabled=true;submitBtn.textContent='⏳ CREATING YOUR TICKET…';setStatus('','Submitting application…','Please wait and do not close this page.');
     try{
-      const data=payload();
-      const response=await postTicket(data);
-      if(response&&response.success===false&&!response.opaque)throw new Error(response.message||'Submission failed.');
-      const ticket=await waitForTicket(requestId,response);
-      ticketNumber.textContent=ticket;
-      formContent.style.display='none';
-      successContent.classList.add('show');
-      window.scrollTo({top:0,behavior:'smooth'});
-    }catch(e){
-      submitting=false;submitBtn.disabled=false;submitBtn.textContent='✅ SUBMIT APPLICATION';
-      setStatus('err','⚠️ Unable to create ticket',e&&e.message?e.message:'Please try again. If the problem continues, contact TechGeekPH through Messenger.');
-    }
+      const result=await createTicket();
+      ticketNumber.textContent=result.ticket_no;
+      formContent.style.display='none';successContent.classList.add('show');window.scrollTo({top:0,behavior:'smooth'});
+    }catch(e){submitting=false;submitBtn.disabled=false;submitBtn.textContent='✅ SUBMIT APPLICATION';setStatus('err','⚠️ Unable to create ticket',e&&e.message?e.message:'Please try again.');}
   }
 
   locateBtn.addEventListener('click',locate);
