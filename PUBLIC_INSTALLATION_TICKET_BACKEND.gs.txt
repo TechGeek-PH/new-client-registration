@@ -1,0 +1,286 @@
+/*
+ * TechGeekPH Public Installation Ticket Backend Patch
+ *
+ * Add the two CASE entries below inside handleApiRequest_(data)'s switch(action),
+ * then paste the functions in this file anywhere below your existing helpers.
+ * Deploy a NEW Web App version after saving.
+ *
+ * ROUTER CASES:
+ *
+ *   case "publicCreateInstallationTicket":
+ *     result = publicCreateInstallationTicket(data);
+ *     break;
+ *
+ *   case "getPublicInstallationTicketStatus":
+ *     result = getPublicInstallationTicketStatus(data);
+ *     break;
+ */
+
+function publicCreateInstallationTicket(data) {
+  data = data || {};
+
+  const requestId = String(data.requestId || "").trim();
+  const clientName = String(data.clientName || data.name || "").trim();
+  const contactNumber = String(data.contactNumber || data.contact || "").trim();
+  const address = String(data.address || "").trim();
+  const landmark = String(data.landmark || "").trim();
+  const preferredPlan = String(data.preferredPlan || data.plan || "").trim();
+  const googleMapsLink = String(data.googleMapsLink || data.mapsUrl || "").trim();
+  const latitude = String(data.latitude || "").trim();
+  const longitude = String(data.longitude || "").trim();
+  const gpsAccuracy = String(data.gpsAccuracy || "").trim();
+
+  if (!requestId) return publicTicketError_("REQUEST_ID_REQUIRED", "Request ID is required.");
+  if (!clientName) return publicTicketError_("NAME_REQUIRED", "Client name is required.");
+  if (!contactNumber) return publicTicketError_("CONTACT_REQUIRED", "Contact number is required.");
+  if (!address) return publicTicketError_("ADDRESS_REQUIRED", "Complete address is required.");
+  if (!landmark) return publicTicketError_("LANDMARK_REQUIRED", "Nearest landmark is required.");
+  if (!preferredPlan) return publicTicketError_("PLAN_REQUIRED", "Preferred plan is required.");
+  if (!googleMapsLink || !latitude || !longitude) {
+    return publicTicketError_("LOCATION_REQUIRED", "GPS location is required.");
+  }
+
+  const phoneKey = normalizePublicTicketPhone_(contactNumber);
+  if (phoneKey.length < 10) {
+    return publicTicketError_("INVALID_CONTACT", "Please enter a valid Philippine mobile number.");
+  }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(15000);
+
+  try {
+    const ss = getSS_();
+    const sheetName = (typeof SHEET !== "undefined" && SHEET.TICKETS) ? SHEET.TICKETS : "Tickets";
+    const sh = ss.getSheetByName(sheetName);
+    if (!sh) return publicTicketError_("TICKETS_SHEET_NOT_FOUND", "Tickets sheet was not found.");
+
+    const info = publicTicketSheetInfo_(sh);
+
+    // Idempotency: the same browser submission/request ID must never create two tickets.
+    const byRequest = findPublicTicketByRequestId_(info, requestId);
+    if (byRequest) {
+      return {
+        success: true,
+        ok: true,
+        duplicate: true,
+        ticketId: byRequest.ticketId,
+        ticketNo: byRequest.ticketId,
+        status: byRequest.status || "Pending",
+        message: "Existing installation ticket returned."
+      };
+    }
+
+    // Duplicate protection: return the client's existing OPEN installation ticket.
+    // This also prevents repeated taps/reloads from creating another installation ticket.
+    const existing = findOpenPublicInstallationTicket_(info, phoneKey, address);
+    if (existing) {
+      attachRequestIdToPublicTicket_(sh, info, existing.rowNumber, requestId);
+      return {
+        success: true,
+        ok: true,
+        duplicate: true,
+        ticketId: existing.ticketId,
+        ticketNo: existing.ticketId,
+        status: existing.status || "Pending",
+        message: "An open installation ticket already exists for this client."
+      };
+    }
+
+    const now = new Date();
+    const ticketId = nextPublicInstallationTicketId_(sh, info, now);
+    const dateCreated = Utilities.formatDate(now, "Asia/Manila", "yyyy-MM-dd");
+    const updatedAt = Utilities.formatDate(now, "Asia/Manila", "yyyy-MM-dd HH:mm:ss");
+
+    const issuePurpose = [
+      "Preferred Plan: " + preferredPlan,
+      "Nearest Landmark: " + landmark,
+      "Cashout / Activation Fee: ₱800"
+    ].join("\n");
+
+    const adminRemarks = [
+      "Source: Public Installation Page",
+      "RequestID: " + requestId,
+      "Google Maps: " + googleMapsLink,
+      "GPS: " + latitude + "," + longitude,
+      gpsAccuracy ? "GPS Accuracy: ±" + gpsAccuracy + " meters" : ""
+    ].filter(String).join("\n");
+
+    const values = {};
+    values["TicketID"] = ticketId;
+    values["Date Created"] = dateCreated;
+    values["ClientID"] = "";
+    values["Client Name"] = clientName;
+    values["Contact Number"] = contactNumber;
+    values["Address"] = address;
+    values["Ticket Type"] = "Installation";
+    values["Issue/Purpose"] = issuePurpose;
+    values["Priority"] = "Normal";
+    values["Assigned Tech"] = "";
+    values["Status"] = "Pending";
+    values["Schedule Date"] = "";
+    values["Photo Link"] = "";
+    values["Tech Remarks"] = "";
+    values["Admin Remarks"] = adminRemarks;
+    values["Created By"] = "Public Registration";
+    values["Last Updated"] = updatedAt;
+
+    const row = info.headers.map(function(header) {
+      return Object.prototype.hasOwnProperty.call(values, header) ? values[header] : "";
+    });
+
+    sh.appendRow(row);
+    SpreadsheetApp.flush();
+
+    return {
+      success: true,
+      ok: true,
+      duplicate: false,
+      ticketId: ticketId,
+      ticketNo: ticketId,
+      status: "Pending",
+      message: "Installation ticket created successfully."
+    };
+  } catch (err) {
+    return publicTicketError_("CREATE_TICKET_FAILED", err && err.message ? err.message : String(err));
+  } finally {
+    try { lock.releaseLock(); } catch (e) {}
+  }
+}
+
+function getPublicInstallationTicketStatus(data) {
+  data = data || {};
+  const requestId = String(data.requestId || "").trim();
+  if (!requestId) return publicTicketError_("REQUEST_ID_REQUIRED", "Request ID is required.");
+
+  try {
+    const ss = getSS_();
+    const sheetName = (typeof SHEET !== "undefined" && SHEET.TICKETS) ? SHEET.TICKETS : "Tickets";
+    const sh = ss.getSheetByName(sheetName);
+    if (!sh) return publicTicketError_("TICKETS_SHEET_NOT_FOUND", "Tickets sheet was not found.");
+
+    const info = publicTicketSheetInfo_(sh);
+    const found = findPublicTicketByRequestId_(info, requestId);
+
+    if (!found) {
+      return {
+        success: false,
+        ok: false,
+        code: "PENDING",
+        message: "Ticket is still being created."
+      };
+    }
+
+    return {
+      success: true,
+      ok: true,
+      ticketId: found.ticketId,
+      ticketNo: found.ticketId,
+      status: found.status || "Pending"
+    };
+  } catch (err) {
+    return publicTicketError_("STATUS_LOOKUP_FAILED", err && err.message ? err.message : String(err));
+  }
+}
+
+function publicTicketSheetInfo_(sh) {
+  const lastRow = Math.max(sh.getLastRow(), 1);
+  const lastColumn = Math.max(sh.getLastColumn(), 1);
+  const values = sh.getRange(1, 1, lastRow, lastColumn).getDisplayValues();
+  const headers = values[0].map(function(v) { return String(v || "").trim(); });
+  const headerIndex = {};
+  headers.forEach(function(h, i) { if (h) headerIndex[h] = i; });
+  return { sheet: sh, values: values, headers: headers, headerIndex: headerIndex };
+}
+
+function findPublicTicketByRequestId_(info, requestId) {
+  const idIndex = info.headerIndex["TicketID"];
+  const remarksIndex = info.headerIndex["Admin Remarks"];
+  const statusIndex = info.headerIndex["Status"];
+  if (idIndex === undefined || remarksIndex === undefined) return null;
+
+  const needle = "RequestID: " + requestId;
+  for (let r = info.values.length - 1; r >= 1; r--) {
+    const remarks = String(info.values[r][remarksIndex] || "");
+    if (remarks.indexOf(needle) !== -1) {
+      return {
+        rowNumber: r + 1,
+        ticketId: String(info.values[r][idIndex] || ""),
+        status: statusIndex === undefined ? "" : String(info.values[r][statusIndex] || "")
+      };
+    }
+  }
+  return null;
+}
+
+function findOpenPublicInstallationTicket_(info, phoneKey, address) {
+  const idIndex = info.headerIndex["TicketID"];
+  const phoneIndex = info.headerIndex["Contact Number"];
+  const addressIndex = info.headerIndex["Address"];
+  const typeIndex = info.headerIndex["Ticket Type"];
+  const statusIndex = info.headerIndex["Status"];
+  if ([idIndex, phoneIndex, typeIndex, statusIndex].some(function(v){ return v === undefined; })) return null;
+
+  const addressKey = normalizePublicTicketText_(address);
+  const finalStatuses = {done:true,resolved:true,cancelled:true,canceled:true,closed:true};
+
+  for (let r = info.values.length - 1; r >= 1; r--) {
+    const row = info.values[r];
+    if (normalizePublicTicketText_(row[typeIndex]) !== "installation") continue;
+    const status = normalizePublicTicketText_(row[statusIndex]);
+    if (finalStatuses[status]) continue;
+    if (normalizePublicTicketPhone_(row[phoneIndex]) !== phoneKey) continue;
+
+    const existingAddress = addressIndex === undefined ? "" : normalizePublicTicketText_(row[addressIndex]);
+    if (addressKey && existingAddress && addressKey !== existingAddress) continue;
+
+    return {
+      rowNumber: r + 1,
+      ticketId: String(row[idIndex] || ""),
+      status: String(row[statusIndex] || "Pending")
+    };
+  }
+  return null;
+}
+
+function attachRequestIdToPublicTicket_(sh, info, rowNumber, requestId) {
+  const remarksIndex = info.headerIndex["Admin Remarks"];
+  if (remarksIndex === undefined) return;
+  const cell = sh.getRange(rowNumber, remarksIndex + 1);
+  const oldValue = String(cell.getValue() || "");
+  const needle = "RequestID: " + requestId;
+  if (oldValue.indexOf(needle) !== -1) return;
+  cell.setValue((oldValue ? oldValue + "\n" : "") + needle);
+}
+
+function nextPublicInstallationTicketId_(sh, info, now) {
+  const dateKey = Utilities.formatDate(now, "Asia/Manila", "yyyyMMdd");
+  const prefix = "TKT-" + dateKey + "-";
+  const idIndex = info.headerIndex["TicketID"];
+  let max = 0;
+
+  if (idIndex !== undefined) {
+    for (let r = 1; r < info.values.length; r++) {
+      const id = String(info.values[r][idIndex] || "");
+      if (id.indexOf(prefix) !== 0) continue;
+      const seq = Number(id.slice(prefix.length));
+      if (Number.isFinite(seq) && seq > max) max = seq;
+    }
+  }
+
+  return prefix + String(max + 1).padStart(5, "0");
+}
+
+function normalizePublicTicketPhone_(value) {
+  let digits = String(value || "").replace(/\D/g, "");
+  if (digits.indexOf("63") === 0 && digits.length >= 12) digits = "0" + digits.slice(2);
+  if (digits.length === 10 && digits.charAt(0) === "9") digits = "0" + digits;
+  return digits;
+}
+
+function normalizePublicTicketText_(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function publicTicketError_(code, message) {
+  return { success: false, ok: false, code: code, message: message };
+}
