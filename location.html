@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#06101c">
   <title>New Installation Request | TechGeekPH</title>
+  <script>
+    // Geolocation is available only in a secure context. Preserve the full
+    // application link (including Facebook/query parameters) during redirect.
+    if (
+      window.location.protocol === 'http:' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      window.location.replace(
+        'https://' +
+        window.location.host +
+        window.location.pathname +
+        window.location.search +
+        window.location.hash
+      );
+    }
+  </script>
   <style>
     :root{
       --bg:#06101c;--bg2:#0a1728;--card:rgba(10,24,42,.94);--card2:#0d1d31;
@@ -202,6 +219,10 @@
 
   function captureLocation(){
     return new Promise((resolve,reject)=>{
+      if(!window.isSecureContext){
+        reject(new Error('A secure HTTPS connection is required to capture GPS. Please reopen this form using https://apply.network-techgeekph.com/location.html, then tap Submit again.'));
+        return;
+      }
       if(!navigator.geolocation){reject(new Error('Location is not supported by this browser. Please use an updated Chrome, Safari, or mobile browser.'));return;}
       navigator.geolocation.getCurrentPosition(pos=>{
         const lat=Number(pos.coords.latitude.toFixed(7));
@@ -211,7 +232,7 @@
         resolve(current);
       },err=>{
         let msg='Unable to get your current location.';
-        if(err.code===1)msg='Location permission was denied. Please allow Location for this site, then tap Submit again.';
+        if(err.code===1)msg='Location access is blocked. Open this site\'s browser permissions, set Location to Allow, reload the page, then tap Submit again.';
         if(err.code===2)msg='Your GPS location is unavailable. Turn on Location/GPS and mobile data or Wi-Fi, then try again.';
         if(err.code===3)msg='GPS timed out. Please try again near a window or in an area with a clearer signal.';
         reject(new Error(msg));
