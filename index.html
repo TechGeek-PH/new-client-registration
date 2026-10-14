@@ -68,6 +68,13 @@
     .location-icon{width:34px;height:34px;border-radius:10px;background:#0e3047;display:grid;place-items:center;flex:0 0 auto;font-size:17px}
     .location-note b{display:block;font-size:13px;color:#edf8ff}
     .location-note span{display:block;margin-top:4px;color:#9fb2c7;font-size:12px;line-height:1.55}
+    .manual-toggle{margin-top:10px;padding:4px 0;border:0;background:transparent;color:#79dfff;font-size:12px;font-weight:800;text-decoration:underline;cursor:pointer}
+    .manual-location{margin-top:12px;padding:14px;border:1px solid #37618b;border-radius:14px;background:#0b2034}
+    .manual-location[hidden]{display:none}
+    .manual-location p{margin:4px 0 10px;color:#b6c9dc;font-size:12px;line-height:1.55}
+    .manual-location a{color:#72dfff}
+    .manual-confirm{display:flex;align-items:flex-start;gap:9px;margin:10px 0 0;font-weight:600;line-height:1.5}
+    .manual-confirm input{margin-top:2px;accent-color:#32c7ff}
     button{font:inherit}
     .submit-btn{width:100%;min-height:56px;margin-top:14px;border:0;border-radius:14px;background:linear-gradient(135deg,#32c7ff,#22c55e);color:#03131b;font-size:14px;font-weight:950;letter-spacing:.02em;cursor:pointer;box-shadow:0 12px 28px rgba(35,197,94,.14);transition:.18s transform,.18s filter}
     .submit-btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
@@ -146,6 +153,14 @@
         <div><b>GPS will be captured automatically on Submit</b><span>Please stay at the actual installation address, turn on your phone's Location/GPS, and tap <b>Allow</b> if your browser asks for location permission.</span></div>
       </div>
 
+      <button id="manualToggle" type="button" class="manual-toggle">GPS not working? Use a manual Google Maps pin</button>
+      <div id="manualLocation" class="manual-location" hidden>
+        <label for="manualCoordinates">Installation location on Google Maps <span class="req">*</span></label>
+        <p>Open <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a>, pin the exact installation address, then copy the latitude and longitude. On a PC, right-click the spot to copy coordinates; on a phone, long-press the spot. Enter coordinates like <b>14.5995, 121.0364</b>. Full Google Maps links containing coordinates are also accepted. Short share links cannot be read here.</p>
+        <input id="manualCoordinates" class="text-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Latitude, Longitude (example: 14.5995, 121.0364)">
+        <label class="manual-confirm" for="confirmManualLocation"><input id="confirmManualLocation" type="checkbox"><span>I confirm this pin is the actual installation address. A technician may verify the location.</span></label>
+      </div>
+
       <div id="status" class="status" role="status" aria-live="polite"></div>
       <button id="submitBtn" class="submit-btn" type="button">SUBMIT INSTALLATION REQUEST</button>
       <p class="submit-note">Please tap Submit only once and keep this page open while your GPS location and ticket are being processed.</p>
@@ -174,6 +189,7 @@
   const $=id=>document.getElementById(id);
   const clientName=$('clientName'),contact=$('contact'),address=$('address'),landmark=$('landmark');
   const submitBtn=$('submitBtn'),statusEl=$('status'),formContent=$('formContent'),successContent=$('successContent'),ticketNumber=$('ticketNumber');
+  const manualToggle=$('manualToggle'),manualLocation=$('manualLocation'),manualCoordinates=$('manualCoordinates'),confirmManualLocation=$('confirmManualLocation');
   let current=null,submitting=false;
 
   const params=new URLSearchParams(window.location.search);
@@ -200,23 +216,62 @@
     return true;
   }
 
-  function captureLocation(){
+  function showManualLocation(){
+    manualLocation.hidden=false;
+    manualToggle.textContent='Manual Google Maps pin option is available below';
+  }
+
+  function parseManualLocation(raw){
+    const pair=/^(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)$/;
+    let match=String(raw||'').trim().match(pair);
+    if(!match){
+      try{
+        const url=new URL(String(raw||'').trim());
+        const host=url.hostname.toLowerCase();
+        if(url.protocol==='https:' && (host==='www.google.com'||host==='google.com'||host==='maps.google.com'||host==='www.google.com.ph'||host==='google.com.ph')){
+          const q=url.searchParams.get('q')||url.searchParams.get('query')||'';
+          match=q.trim().match(pair);
+          if(!match)match=url.pathname.match(/\/@(-?\d{1,2}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)(?:,|\/|$)/);
+        }
+      }catch(_){ }
+    }
+    if(!match)throw new Error('Enter coordinates in the form 14.5995, 121.0364 or a full Google Maps URL with coordinates. Short links will not work.');
+    const lat=Number(match[1]),lng=Number(match[2]);
+    if(!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180||(lat===0&&lng===0)){
+      throw new Error('The map coordinates are invalid. Check the latitude and longitude of the actual installation address.');
+    }
+    return {lat,lng,accuracy:null,source:'manual',mapsUrl:'https://www.google.com/maps?q='+lat+','+lng};
+  }
+
+  function fromGpsPosition(pos){
+    const lat=Number(pos.coords.latitude.toFixed(7));
+    const lng=Number(pos.coords.longitude.toFixed(7));
+    const acc=Number(pos.coords.accuracy||0);
+    current={lat,lng,accuracy:acc,source:'gps',mapsUrl:'https://www.google.com/maps?q='+lat+','+lng};
+    return current;
+  }
+
+  function requestGps(options){
     return new Promise((resolve,reject)=>{
-      if(!navigator.geolocation){reject(new Error('Location is not supported by this browser. Please use an updated Chrome, Safari, or mobile browser.'));return;}
-      navigator.geolocation.getCurrentPosition(pos=>{
-        const lat=Number(pos.coords.latitude.toFixed(7));
-        const lng=Number(pos.coords.longitude.toFixed(7));
-        const acc=Number(pos.coords.accuracy||0);
-        current={lat,lng,accuracy:acc,mapsUrl:'https://www.google.com/maps?q='+lat+','+lng};
-        resolve(current);
-      },err=>{
-        let msg='Unable to get your current location.';
-        if(err.code===1)msg='Location permission was denied. Please allow Location for this site, then tap Submit again.';
-        if(err.code===2)msg='Your GPS location is unavailable. Turn on Location/GPS and mobile data or Wi-Fi, then try again.';
-        if(err.code===3)msg='GPS timed out. Please try again near a window or in an area with a clearer signal.';
-        reject(new Error(msg));
-      },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+      navigator.geolocation.getCurrentPosition(pos=>resolve(fromGpsPosition(pos)),reject,options);
     });
+  }
+
+  async function captureLocation(){
+    if(!window.isSecureContext)throw new Error('Automatic GPS needs HTTPS. This page was opened using HTTP. Please use the HTTPS address, or enter the exact Google Maps pin manually below.');
+    if(!navigator.geolocation)throw new Error('Location is not supported by this browser. Please use a current browser or provide a manual Google Maps pin.');
+    try{
+      return await requestGps({enableHighAccuracy:true,timeout:12000,maximumAge:10000});
+    }catch(err){
+      if(err&&err.code===1)throw new Error('Location permission was denied. Allow Location in browser settings or use the manual Google Maps pin below.');
+      setStatus('','Trying another location method','High-accuracy GPS was unavailable. Retrying using available Wi-Fi or network location.');
+      try{
+        return await requestGps({enableHighAccuracy:false,timeout:12000,maximumAge:60000});
+      }catch(retryErr){
+        if(retryErr&&retryErr.code===1)throw new Error('Location permission was denied. Allow Location in browser settings or use the manual Google Maps pin below.');
+        throw new Error('GPS could not determine your location. Please enter the exact installation address coordinates using the Google Maps pin option below.');
+      }
+    }
   }
 
   async function createTicket(){
@@ -230,7 +285,7 @@
       p_google_maps_link:current.mapsUrl,
       p_latitude:current.lat,
       p_longitude:current.lng,
-      p_gps_accuracy:Math.round(current.accuracy)
+      p_gps_accuracy:current.source==='manual'?null:Math.round(current.accuracy)
     };
     const res=await fetch(RPC_URL,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body)});
     const text=await res.text();let data=null;try{data=text?JSON.parse(text):null;}catch(_){data=null;}
@@ -246,9 +301,15 @@
     submitting=true;submitBtn.disabled=true;submitBtn.textContent='GETTING YOUR GPS LOCATION…';
     setStatus('','Getting your current location','Please tap Allow if your browser asks for location permission.');
     try{
-      await captureLocation();
+      if(manualCoordinates.value.trim()){
+        showManualLocation();
+        if(!confirmManualLocation.checked)throw new Error('Confirm that your manual Google Maps pin is the actual installation address.');
+        current=parseManualLocation(manualCoordinates.value);
+      }else{
+        await captureLocation();
+      }
       submitBtn.textContent='CREATING YOUR INSTALLATION TICKET…';
-      setStatus('','Submitting your request','GPS location captured. Please keep this page open while we create your ticket.');
+      setStatus('','Submitting your request',current.source==='manual'?'Manual map pin confirmed. Creating your installation ticket.':'GPS location captured. Please keep this page open while we create your ticket.');
       const result=await createTicket();
       ticketNumber.textContent=result.ticket_no;
       formContent.style.display='none';
@@ -257,12 +318,20 @@
       window.scrollTo({top:0,behavior:'smooth'});
     }catch(e){
       submitting=false;submitBtn.disabled=false;submitBtn.textContent='SUBMIT INSTALLATION REQUEST';
+      if(!current)showManualLocation();
       setStatus('err','Unable to submit request',e&&e.message?e.message:'Please try again.');
     }
   }
 
   submitBtn.addEventListener('click',submit);
+  manualToggle.addEventListener('click',()=>{showManualLocation();manualCoordinates.focus();});
+  manualCoordinates.addEventListener('input',()=>{if(statusEl.classList.contains('err'))clearStatus();});
+  confirmManualLocation.addEventListener('change',()=>{if(statusEl.classList.contains('err'))clearStatus();});
   [clientName,contact,address,landmark].forEach(el=>el.addEventListener('input',()=>{if(statusEl.classList.contains('err'))clearStatus();}));
+  if(!window.isSecureContext){
+    showManualLocation();
+    setStatus('','Automatic GPS requires HTTPS','This link is using HTTP. For a more secure connection, open https://apply.network-techgeekph.com/ instead. If GPS still fails, use the manual Google Maps pin option.');
+  }
 })();
 </script>
 </body>
