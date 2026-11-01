@@ -82,6 +82,15 @@
     .manual-location a{color:#72dfff}
     .manual-confirm{display:flex;align-items:flex-start;gap:9px;margin:10px 0 0;font-weight:600;line-height:1.5}
     .manual-confirm input{margin-top:2px;accent-color:#32c7ff}
+    .manual-review,.manual-verify{display:block;width:100%;margin-top:11px;padding:12px;border:1px solid #317ba2;border-radius:12px;background:#12364b;color:#c2f0ff;font-size:13px;font-weight:850;cursor:pointer}
+    .manual-verify{background:#10372e;border-color:#31866b;color:#b7f9db}
+    .manual-preview{margin-top:12px;border:1px solid #315b79;border-radius:12px;overflow:hidden;background:#071827;padding:10px}
+    .manual-preview[hidden]{display:none}
+    .manual-preview iframe{display:block;width:100%;height:260px;border:0;border-radius:8px;background:#102a42}
+    .manual-preview a{display:inline-block;margin-top:10px;color:#78ddff;font-size:13px;font-weight:800}
+    .manual-preview p{margin-top:9px}
+    .pin-feedback{margin-top:10px;padding:10px 12px;border:1px solid #405b72;border-radius:10px;color:#b6c9dc;font-size:12px;line-height:1.5}
+    .pin-feedback.verified{border-color:#2c826b;background:#0b3128;color:#91f4c7}
     button{font:inherit}
     .submit-btn{width:100%;min-height:56px;margin-top:14px;border:0;border-radius:14px;background:linear-gradient(135deg,#32c7ff,#22c55e);color:#03131b;font-size:14px;font-weight:950;letter-spacing:.02em;cursor:pointer;box-shadow:0 12px 28px rgba(35,197,94,.14);transition:.18s transform,.18s filter}
     .submit-btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
@@ -114,11 +123,11 @@
   <section class="hero">
     <div class="eyebrow">New service application</div>
     <h1>New Installation Request</h1>
-    <p>Complete your details while you are at the installation address. When you tap Submit, your phone will automatically capture the current GPS location and create your installation ticket.</p>
+    <p>Complete the client's details. Use automatic GPS when at the installation address, or manually verify a Google Maps pin when submitting for a client from another location.</p>
     <div class="steps">
       <div class="step"><strong>01 · Details</strong><span>Client information</span></div>
       <div class="step"><strong>02 · Plan</strong><span>Select service plan</span></div>
-      <div class="step"><strong>03 · Submit</strong><span>Auto GPS + ticket</span></div>
+      <div class="step"><strong>03 · Submit</strong><span>GPS or verified map pin</span></div>
     </div>
   </section>
 
@@ -169,21 +178,29 @@
 
       <div class="location-note">
         <div class="location-icon">📍</div>
-        <div><b>Automatic GPS is tried first</b><span>Stay at the installation address, turn on your phone's Location/GPS, and tap <b>Allow</b> if requested. If automatic GPS fails, a manual Google Maps pin button will appear.</span></div>
+        <div><b>Choose automatic GPS or manual Google Maps pin</b><span>At the installation address? Submit using your device GPS. Submitting from the office or on behalf of a client? Select the manual map option below and verify the exact installation pin first.</span></div>
       </div>
 
       <div id="status" class="status" role="status" aria-live="polite"></div>
-      <button id="manualToggle" type="button" class="manual-toggle" hidden>📍 Use Manual Google Maps Pin Instead</button>
+      <button id="manualToggle" type="button" class="manual-toggle">📍 Manual Map Location / Submit for Client</button>
       <div id="manualLocation" class="manual-location" hidden>
-        <label for="manualCoordinates">Installation location on Google Maps <span class="req">*</span></label>
-        <p>Open <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a>, pin the exact installation address, then copy the latitude and longitude. On a PC, right-click the spot to copy coordinates; on a phone, long-press the spot. Enter coordinates like <b>14.5995, 121.0364</b>. Full Google Maps links containing coordinates are also accepted. Short share links cannot be read here.</p>
-        <input id="manualCoordinates" class="text-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Latitude, Longitude (example: 14.5995, 121.0364)">
-        <label class="manual-confirm" for="confirmManualLocation"><input id="confirmManualLocation" type="checkbox"><span>I confirm this pin is the actual installation address. A technician may verify the location.</span></label>
-        <button id="retryAutoGps" type="button" class="retry-gps">↻ Try Automatic GPS Again</button>
+        <label for="manualCoordinates">Exact installation location on Google Maps <span class="req">*</span></label>
+        <p>Find the client's actual house in <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a>. On a PC, right-click the house to copy coordinates; on a phone, long-press the location. Paste coordinates such as <b>14.5995, 121.0364</b>, or a full Google Maps URL containing coordinates. Short share links are not supported.</p>
+        <input id="manualCoordinates" class="text-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Latitude, Longitude or full Google Maps URL">
+        <button id="reviewManualPin" type="button" class="manual-review">🔎 Review Pin on Google Maps</button>
+        <div id="manualPreview" class="manual-preview" hidden>
+          <iframe id="manualMapFrame" title="Google Maps installation pin preview" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <a id="manualMapLink" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Open exact pin in Google Maps ↗</a>
+          <p>Check the pin against the house and address. Valid coordinates do not automatically prove that this is the correct client location.</p>
+        </div>
+        <label class="manual-confirm" for="confirmManualLocation"><input id="confirmManualLocation" type="checkbox"><span>I have checked the pin on Google Maps and confirm it matches the client's actual installation address. I have permission to submit this request if applying on their behalf.</span></label>
+        <button id="verifyManualPin" type="button" class="manual-verify">✓ Verify Map Pin</button>
+        <div id="manualPinFeedback" class="pin-feedback" role="status" aria-live="polite">Map pin not yet verified. Review it before submitting.</div>
+        <button id="retryAutoGps" type="button" class="retry-gps">↻ Use Automatic GPS Instead</button>
       </div>
       <button id="submitBtn" class="submit-btn" type="button">SUBMIT INSTALLATION REQUEST</button>
-      <p class="submit-note">Please tap Submit only once and keep this page open while your GPS location and ticket are being processed.</p>
-      <p class="privacy">Your location is requested only when you tap Submit. TechGeekPH does not continuously track your device.</p>
+      <p class="submit-note">Tap Submit once. Automatic GPS will be requested only in GPS mode; manual mode requires a reviewed and confirmed map pin.</p>
+      <p class="privacy">Device location is requested only when you submit using automatic GPS. Manual map pins are self-confirmed and may be checked by a technician. TechGeekPH does not continuously track your device.</p>
     </div>
 
     <div id="successContent" class="success" aria-live="polite">
@@ -209,7 +226,8 @@
   const clientName=$('clientName'),contact=$('contact'),address=$('address'),landmark=$('landmark');
   const submitBtn=$('submitBtn'),statusEl=$('status'),formContent=$('formContent'),successContent=$('successContent'),ticketNumber=$('ticketNumber'),advanceAmount=$('advanceAmount');
   const manualToggle=$('manualToggle'),manualLocation=$('manualLocation'),manualCoordinates=$('manualCoordinates'),confirmManualLocation=$('confirmManualLocation'),retryAutoGps=$('retryAutoGps');
-  let current=null,submitting=false,manualMode=false;
+  const reviewManualPinBtn=$('reviewManualPin'),verifyManualPinBtn=$('verifyManualPin'),manualPreview=$('manualPreview'),manualMapFrame=$('manualMapFrame'),manualMapLink=$('manualMapLink'),manualPinFeedback=$('manualPinFeedback');
+  let current=null,submitting=false,manualMode=false,manualReviewed=null,manualVerified=null;
 
   const params=new URLSearchParams(window.location.search);
   if(params.get('name'))clientName.value=params.get('name');
@@ -239,9 +257,20 @@
   function showManualOption(){
     manualToggle.hidden=false;
   }
+  function resetManualPin(){
+    manualReviewed=null;
+    manualVerified=null;
+    confirmManualLocation.checked=false;
+    manualPreview.hidden=true;
+    manualMapFrame.removeAttribute('src');
+    manualPinFeedback.className='pin-feedback';
+    manualPinFeedback.textContent='Map pin not yet verified. Review it before submitting.';
+    submitBtn.textContent='SUBMIT INSTALLATION REQUEST';
+  }
   function showManualLocation(){
     manualMode=true;
     current=null;
+    resetManualPin();
     manualToggle.hidden=true;
     manualLocation.hidden=false;
   }
@@ -249,9 +278,9 @@
     manualMode=false;
     current=null;
     manualCoordinates.value='';
-    confirmManualLocation.checked=false;
+    resetManualPin();
     manualLocation.hidden=true;
-    manualToggle.hidden=true;
+    manualToggle.hidden=false;
     clearStatus();
   }
 
@@ -263,8 +292,9 @@
         const url=new URL(String(raw||'').trim());
         const host=url.hostname.toLowerCase();
         if(url.protocol==='https:' && (host==='www.google.com'||host==='google.com'||host==='maps.google.com'||host==='www.google.com.ph'||host==='google.com.ph')){
-          const q=url.searchParams.get('q')||url.searchParams.get('query')||'';
+          const q=url.searchParams.get('q')||url.searchParams.get('query')||url.searchParams.get('ll')||'';
           match=q.trim().match(pair);
+          if(!match)match=url.pathname.match(/!3d(-?\d{1,2}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/);
           if(!match)match=url.pathname.match(/\/@(-?\d{1,2}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)(?:,|\/|$)/);
         }
       }catch(_){ }
@@ -275,6 +305,39 @@
       throw new Error('The map coordinates are invalid. Check the latitude and longitude of the actual installation address.');
     }
     return {lat,lng,accuracy:null,source:'manual',mapsUrl:'https://www.google.com/maps?q='+lat+','+lng};
+  }
+
+  function reviewManualPin(){
+    try{
+      resetManualPin();
+      const raw=manualCoordinates.value.trim();
+      if(!raw)throw new Error('Paste the installation coordinates or a full Google Maps URL first.');
+      const pin=parseManualLocation(raw);
+      manualReviewed={raw,pin};
+      manualMapLink.href=pin.mapsUrl;
+      manualMapFrame.src='https://www.google.com/maps?q='+encodeURIComponent(pin.lat+','+pin.lng)+'&z=18&output=embed';
+      manualPreview.hidden=false;
+      manualPinFeedback.textContent='Reviewing '+pin.lat+', '+pin.lng+'. Check the house on the map, then tick the confirmation and press Verify Map Pin.';
+      clearStatus();
+    }catch(e){
+      setStatus('err','Unable to review map pin',e.message);
+    }
+  }
+  function verifyManualPin(){
+    const raw=manualCoordinates.value.trim();
+    if(!manualReviewed||manualReviewed.raw!==raw){
+      setStatus('err','Review the map pin first','Enter the location and press Review Pin on Google Maps before verifying.');
+      return;
+    }
+    if(!confirmManualLocation.checked){
+      setStatus('err','Confirm the installation address','Check the map and tick the confirmation before verifying the pin.');
+      return;
+    }
+    manualVerified={raw,pin:manualReviewed.pin};
+    manualPinFeedback.className='pin-feedback verified';
+    manualPinFeedback.textContent='✓ Manual map pin reviewed and confirmed: '+manualVerified.pin.lat+', '+manualVerified.pin.lng+'. Ready to submit.';
+    submitBtn.textContent='SUBMIT VERIFIED INSTALLATION REQUEST';
+    clearStatus();
   }
 
   function fromGpsPosition(pos){
@@ -336,9 +399,10 @@
     setStatus('',manualMode?'Checking your manual Google Maps pin':'Getting your current location',manualMode?'Confirm your exact installation location before submitting.':'Please tap Allow if your browser asks for location permission.');
     try{
       if(manualMode){
-        if(!manualCoordinates.value.trim())throw new Error('Enter your exact Google Maps coordinates or full location URL.');
-        if(!confirmManualLocation.checked)throw new Error('Confirm that your manual Google Maps pin is the actual installation address.');
-        current=parseManualLocation(manualCoordinates.value);
+        if(!manualVerified||manualVerified.raw!==manualCoordinates.value.trim()||!confirmManualLocation.checked){
+          throw new Error('Review the Google Maps pin, tick the location confirmation, then press Verify Map Pin before submitting.');
+        }
+        current=manualVerified.pin;
       }else{
         try{
           await captureLocation();
@@ -349,7 +413,7 @@
         }
       }
       submitBtn.textContent='CREATING YOUR INSTALLATION TICKET…';
-      setStatus('','Submitting your request',current.source==='manual'?'Manual map pin confirmed. Creating your installation ticket.':'GPS location captured. Please keep this page open while we create your ticket.');
+      setStatus('','Submitting your request',current.source==='manual'?'Self-confirmed manual map pin. Creating your installation ticket.':'GPS location captured. Please keep this page open while we create your ticket.');
       const result=await createTicket();
       ticketNumber.textContent=result.ticket_no;
       formContent.style.display='none';
@@ -357,7 +421,7 @@
       try{sessionStorage.removeItem(REQUEST_KEY);}catch(_){ }
       window.scrollTo({top:0,behavior:'smooth'});
     }catch(e){
-      submitting=false;submitBtn.disabled=false;submitBtn.textContent='SUBMIT INSTALLATION REQUEST';
+      submitting=false;submitBtn.disabled=false;submitBtn.textContent=manualMode&&manualVerified?'SUBMIT VERIFIED INSTALLATION REQUEST':'SUBMIT INSTALLATION REQUEST';
       setStatus('err','Unable to submit request',e&&e.message?e.message:'Please try again.');
     }
   }
@@ -367,8 +431,18 @@
   submitBtn.addEventListener('click',submit);
   manualToggle.addEventListener('click',()=>{showManualLocation();clearStatus();manualCoordinates.focus();});
   retryAutoGps.addEventListener('click',useAutomaticGps);
-  manualCoordinates.addEventListener('input',()=>{if(statusEl.classList.contains('err'))clearStatus();});
-  confirmManualLocation.addEventListener('change',()=>{if(statusEl.classList.contains('err'))clearStatus();});
+  reviewManualPinBtn.addEventListener('click',reviewManualPin);
+  verifyManualPinBtn.addEventListener('click',verifyManualPin);
+  manualCoordinates.addEventListener('input',()=>{resetManualPin();if(statusEl.classList.contains('err'))clearStatus();});
+  confirmManualLocation.addEventListener('change',()=>{
+    if(!confirmManualLocation.checked&&manualVerified){
+      manualVerified=null;
+      manualPinFeedback.className='pin-feedback';
+      manualPinFeedback.textContent='Confirmation unchecked. Verify the pin again before submitting.';
+      submitBtn.textContent='SUBMIT INSTALLATION REQUEST';
+    }
+    if(statusEl.classList.contains('err'))clearStatus();
+  });
   [clientName,contact,address,landmark].forEach(el=>el.addEventListener('input',()=>{if(statusEl.classList.contains('err'))clearStatus();}));
   if(!window.isSecureContext||!navigator.geolocation){
     showManualOption();
