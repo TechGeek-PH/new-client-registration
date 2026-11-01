@@ -73,7 +73,9 @@
     .location-icon{width:34px;height:34px;border-radius:10px;background:#0e3047;display:grid;place-items:center;flex:0 0 auto;font-size:17px}
     .location-note b{display:block;font-size:13px;color:#edf8ff}
     .location-note span{display:block;margin-top:4px;color:#9fb2c7;font-size:12px;line-height:1.55}
-    .manual-toggle{margin-top:10px;padding:4px 0;border:0;background:transparent;color:#79dfff;font-size:12px;font-weight:800;text-decoration:underline;cursor:pointer}
+    .manual-toggle{display:block;width:100%;margin-top:12px;padding:12px 14px;border:1px solid #317ba2;border-radius:12px;background:#102d42;color:#a3e7ff;font-size:13px;font-weight:850;text-align:center;cursor:pointer}
+    .manual-toggle[hidden]{display:none}
+    .retry-gps{display:block;width:100%;margin-top:13px;padding:10px;border:1px solid #335675;border-radius:10px;background:transparent;color:#a3e7ff;font-size:12px;font-weight:800;cursor:pointer}
     .manual-location{margin-top:12px;padding:14px;border:1px solid #37618b;border-radius:14px;background:#0b2034}
     .manual-location[hidden]{display:none}
     .manual-location p{margin:4px 0 10px;color:#b6c9dc;font-size:12px;line-height:1.55}
@@ -167,18 +169,18 @@
 
       <div class="location-note">
         <div class="location-icon">📍</div>
-        <div><b>GPS will be captured automatically on Submit</b><span>Please stay at the actual installation address, turn on your phone's Location/GPS, and tap <b>Allow</b> if your browser asks for location permission.</span></div>
+        <div><b>Automatic GPS is tried first</b><span>Stay at the installation address, turn on your phone's Location/GPS, and tap <b>Allow</b> if requested. If automatic GPS fails, a manual Google Maps pin button will appear.</span></div>
       </div>
 
-      <button id="manualToggle" type="button" class="manual-toggle">GPS not working? Use a manual Google Maps pin</button>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <button id="manualToggle" type="button" class="manual-toggle" hidden>📍 Use Manual Google Maps Pin Instead</button>
       <div id="manualLocation" class="manual-location" hidden>
         <label for="manualCoordinates">Installation location on Google Maps <span class="req">*</span></label>
         <p>Open <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a>, pin the exact installation address, then copy the latitude and longitude. On a PC, right-click the spot to copy coordinates; on a phone, long-press the spot. Enter coordinates like <b>14.5995, 121.0364</b>. Full Google Maps links containing coordinates are also accepted. Short share links cannot be read here.</p>
         <input id="manualCoordinates" class="text-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Latitude, Longitude (example: 14.5995, 121.0364)">
         <label class="manual-confirm" for="confirmManualLocation"><input id="confirmManualLocation" type="checkbox"><span>I confirm this pin is the actual installation address. A technician may verify the location.</span></label>
+        <button id="retryAutoGps" type="button" class="retry-gps">↻ Try Automatic GPS Again</button>
       </div>
-
-      <div id="status" class="status" role="status" aria-live="polite"></div>
       <button id="submitBtn" class="submit-btn" type="button">SUBMIT INSTALLATION REQUEST</button>
       <p class="submit-note">Please tap Submit only once and keep this page open while your GPS location and ticket are being processed.</p>
       <p class="privacy">Your location is requested only when you tap Submit. TechGeekPH does not continuously track your device.</p>
@@ -206,8 +208,8 @@
   const $=id=>document.getElementById(id);
   const clientName=$('clientName'),contact=$('contact'),address=$('address'),landmark=$('landmark');
   const submitBtn=$('submitBtn'),statusEl=$('status'),formContent=$('formContent'),successContent=$('successContent'),ticketNumber=$('ticketNumber'),advanceAmount=$('advanceAmount');
-  const manualToggle=$('manualToggle'),manualLocation=$('manualLocation'),manualCoordinates=$('manualCoordinates'),confirmManualLocation=$('confirmManualLocation');
-  let current=null,submitting=false;
+  const manualToggle=$('manualToggle'),manualLocation=$('manualLocation'),manualCoordinates=$('manualCoordinates'),confirmManualLocation=$('confirmManualLocation'),retryAutoGps=$('retryAutoGps');
+  let current=null,submitting=false,manualMode=false;
 
   const params=new URLSearchParams(window.location.search);
   if(params.get('name'))clientName.value=params.get('name');
@@ -234,9 +236,23 @@
     return true;
   }
 
+  function showManualOption(){
+    manualToggle.hidden=false;
+  }
   function showManualLocation(){
+    manualMode=true;
+    current=null;
+    manualToggle.hidden=true;
     manualLocation.hidden=false;
-    manualToggle.textContent='Manual Google Maps pin option is available below';
+  }
+  function useAutomaticGps(){
+    manualMode=false;
+    current=null;
+    manualCoordinates.value='';
+    confirmManualLocation.checked=false;
+    manualLocation.hidden=true;
+    manualToggle.hidden=true;
+    clearStatus();
   }
 
   function parseManualLocation(raw){
@@ -316,15 +332,21 @@
     if(submitting)return;
     clearStatus();
     if(!validateDetails())return;
-    submitting=true;submitBtn.disabled=true;submitBtn.textContent='GETTING YOUR GPS LOCATION…';
-    setStatus('','Getting your current location','Please tap Allow if your browser asks for location permission.');
+    submitting=true;submitBtn.disabled=true;submitBtn.textContent=manualMode?'CHECKING YOUR MANUAL PIN…':'GETTING YOUR GPS LOCATION…';
+    setStatus('',manualMode?'Checking your manual Google Maps pin':'Getting your current location',manualMode?'Confirm your exact installation location before submitting.':'Please tap Allow if your browser asks for location permission.');
     try{
-      if(manualCoordinates.value.trim()){
-        showManualLocation();
+      if(manualMode){
+        if(!manualCoordinates.value.trim())throw new Error('Enter your exact Google Maps coordinates or full location URL.');
         if(!confirmManualLocation.checked)throw new Error('Confirm that your manual Google Maps pin is the actual installation address.');
         current=parseManualLocation(manualCoordinates.value);
       }else{
-        await captureLocation();
+        try{
+          await captureLocation();
+        }catch(gpsError){
+          current=null;
+          showManualOption();
+          throw new Error((gpsError&&gpsError.message?gpsError.message:'GPS could not determine your location.')+' Tap “Use Manual Google Maps Pin Instead” below to continue.');
+        }
       }
       submitBtn.textContent='CREATING YOUR INSTALLATION TICKET…';
       setStatus('','Submitting your request',current.source==='manual'?'Manual map pin confirmed. Creating your installation ticket.':'GPS location captured. Please keep this page open while we create your ticket.');
@@ -336,7 +358,6 @@
       window.scrollTo({top:0,behavior:'smooth'});
     }catch(e){
       submitting=false;submitBtn.disabled=false;submitBtn.textContent='SUBMIT INSTALLATION REQUEST';
-      if(!current)showManualLocation();
       setStatus('err','Unable to submit request',e&&e.message?e.message:'Please try again.');
     }
   }
@@ -344,13 +365,14 @@
   document.querySelectorAll('input[name="plan"]').forEach(el=>el.addEventListener('change',updateAdvanceAmount));
   updateAdvanceAmount();
   submitBtn.addEventListener('click',submit);
-  manualToggle.addEventListener('click',()=>{showManualLocation();manualCoordinates.focus();});
+  manualToggle.addEventListener('click',()=>{showManualLocation();clearStatus();manualCoordinates.focus();});
+  retryAutoGps.addEventListener('click',useAutomaticGps);
   manualCoordinates.addEventListener('input',()=>{if(statusEl.classList.contains('err'))clearStatus();});
   confirmManualLocation.addEventListener('change',()=>{if(statusEl.classList.contains('err'))clearStatus();});
   [clientName,contact,address,landmark].forEach(el=>el.addEventListener('input',()=>{if(statusEl.classList.contains('err'))clearStatus();}));
-  if(!window.isSecureContext){
-    showManualLocation();
-    setStatus('','Automatic GPS requires HTTPS','This link is using HTTP. For a more secure connection, open https://apply.network-techgeekph.com/ instead. If GPS still fails, use the manual Google Maps pin option.');
+  if(!window.isSecureContext||!navigator.geolocation){
+    showManualOption();
+    setStatus('err','Automatic GPS is unavailable','Open the HTTPS link in Chrome or tap the manual Google Maps pin button below to continue.');
   }
 })();
 </script>
