@@ -98,6 +98,15 @@
     .terms-consent input{width:19px;height:19px;flex:0 0 19px;margin:2px 0 0;accent-color:#22c55e}
     .terms-name{margin-top:13px}.terms-name small{display:block;color:#9bb0c5;margin-top:6px;font-size:11px;line-height:1.5}
     .terms-error{display:none;margin-top:11px;color:#ffb7c3;font-size:12px;line-height:1.5}.terms-error.show{display:block}
+    .biz-permit{margin:13px 0 0;padding:16px;border:1px solid #3381a3;border-radius:14px;background:#08283a}
+    .biz-permit[hidden]{display:none}
+    .biz-permit h3{margin:0 0 7px;font-size:14px;color:#abebff}
+    .biz-permit p{font-size:12px;line-height:1.55;color:#bad2e2;margin:0 0 12px}
+    .biz-permit input[type=file]{display:block;width:100%;border:1px dashed #4682a5;border-radius:10px;padding:14px;background:#071a29;color:#edf9ff;font-size:12px}
+    .biz-permit input[type=file]::file-selector-button{margin-right:12px;border:0;border-radius:8px;padding:9px 12px;background:#1f779f;color:white;font-weight:800}
+    .biz-permit .file-status{font-size:12px;margin-top:9px;color:#9cc7df}
+    .biz-permit .file-status.error{color:#ffc1cb}
+    .biz-permit .file-status.ok{color:#94edc6}
     .pin-feedback{margin-top:10px;padding:10px 12px;border:1px solid #405b72;border-radius:10px;color:#b6c9dc;font-size:12px;line-height:1.5}
     .pin-feedback.verified{border-color:#2c826b;background:#0b3128;color:#91f4c7}
     button{font:inherit}
@@ -175,6 +184,14 @@
         <label class="plan"><input type="radio" name="plan" data-advance="₱1,599" value="Biz Plan ₱1,599/month – up to 200 Mbps"><span><b>Biz Plan · ₱1,599/month</b><small>Up to 200 Mbps</small></span></label>
       </div>
 
+      <div class="biz-permit" id="bizPermitSection" hidden>
+        <h3>Business Permit Upload <span class="req">* REQUIRED FOR BIZ PLAN</span></h3>
+        <p>Upload a clear, current Business Permit for the business installation address. PDF, JPG, PNG or WebP; maximum 10 MB. This document is stored privately and reviewed by authorized TECHGEEKPH staff.</p>
+        <label for="businessPermit">Upload Business Permit <span class="req">*</span></label>
+        <input id="businessPermit" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp">
+        <div class="file-status" id="businessPermitStatus" role="status" aria-live="polite">No Business Permit selected. Upload required before submitting.</div>
+      </div>
+
       <div class="cashout" role="note">
         <div><b>FREE Installation · No separate activation fee</b><span class="advance-description">Only 1 month advance subscription payment is required upon installation and activation. This is payment for internet service, not an installation charge.</span></div>
         <strong id="advanceAmount">Select a plan</strong>
@@ -241,6 +258,7 @@
       <div class="success-icon">✓</div>
       <h2>Application Submitted</h2>
       <p class="lead">Your installation request has been received and added to the installation queue.</p>
+      <p class="lead" id="bizPermitSuccess" hidden>Your Business Permit has been securely received and is pending staff verification.</p>
       <div class="ticket-box"><span>Installation Ticket Number</span><strong id="ticketNumber">—</strong></div>
       <div class="queue-msg"><b>Your request is now lined up for installation.</b><br><br>Please keep your phone available and wait for a <b>call or text from our technician</b>. We cannot guarantee an exact installation date because field schedules depend on current workload, and active repair concerns are prioritized to restore affected clients first.<br><br>Thank you for your patience. Please keep your ticket number for reference.</div>
     </div>
@@ -255,6 +273,10 @@
   const SUPABASE_URL='https://tcexzfztdgximrzuosqs.supabase.co';
   const SUPABASE_KEY='sb_publishable_8H8_S7NTWvzPCLvYUe2C4g_k3Ltjfiz';
   const RPC_URL=SUPABASE_URL+'/rest/v1/rpc/public_create_installation_ticket_with_terms';
+  const BIZ_ENDPOINT=SUPABASE_URL+'/functions/v1/public-biz-permit-installation';
+  const BIZ_PLAN='Biz Plan ₱1,599/month – up to 200 Mbps';
+  const BIZ_MAX_SIZE=10*1024*1024;
+  const BIZ_FILE_TYPES=['application/pdf','image/jpeg','image/png','image/webp'];
   const TERMS_VERSION='TGP-INSTALL-2026-11-01';
   const REQUEST_KEY='tg_public_install_request_id';
   const $=id=>document.getElementById(id);
@@ -263,6 +285,7 @@
   const manualToggle=$('manualToggle'),manualLocation=$('manualLocation'),manualCoordinates=$('manualCoordinates'),confirmManualLocation=$('confirmManualLocation'),retryAutoGps=$('retryAutoGps');
   const reviewManualPinBtn=$('reviewManualPin'),verifyManualPinBtn=$('verifyManualPin'),manualPreview=$('manualPreview'),manualMapFrame=$('manualMapFrame'),manualMapLink=$('manualMapLink'),manualPinFeedback=$('manualPinFeedback');
   const termsAccepted=$('termsAccepted'),agreementName=$('agreementName'),termsBlock=$('termsBlock'),termsError=$('termsError');
+  const bizPermitSection=$('bizPermitSection'),businessPermit=$('businessPermit'),businessPermitStatus=$('businessPermitStatus'),bizPermitSuccess=$('bizPermitSuccess');
   let current=null,submitting=false,manualMode=false,manualReviewed=null,manualVerified=null;
 
   const params=new URLSearchParams(window.location.search);
@@ -273,7 +296,28 @@
   function setStatus(kind,title,detail){statusEl.className='status show '+(kind||'');statusEl.innerHTML='<div class="title">'+esc(title)+'</div><div class="small">'+esc(detail||'')+'</div>';}
   function clearStatus(){statusEl.className='status';statusEl.innerHTML='';}
   function selectedPlan(){const el=document.querySelector('input[name="plan"]:checked');return el?el.value:'';}
-  function updateAdvanceAmount(){const el=document.querySelector('input[name="plan"]:checked');advanceAmount.textContent=el?(el.dataset.advance+' advance'):'Select a plan';}
+  function isBizPlan(){return selectedPlan()===BIZ_PLAN;}
+  function permitFile(){return businessPermit.files&&businessPermit.files[0];}
+  function validatePermitFile(){
+    const file=permitFile();
+    if(!file)return 'Please upload a Business Permit for the ₱1,599 Business Plan.';
+    const ext=(file.name.split('.').pop()||'').toLowerCase();
+    if(!['pdf','jpg','jpeg','png','webp'].includes(ext)||!BIZ_FILE_TYPES.includes(file.type))return 'Business Permit must be a PDF, JPG, PNG or WebP file.';
+    if(file.size<100||file.size>BIZ_MAX_SIZE)return 'Business Permit must be valid and no larger than 10 MB.';
+    return '';
+  }
+  function showPermitStatus(){
+    const error=validatePermitFile(),file=permitFile();
+    businessPermitStatus.textContent=error || ('Ready to upload: '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB).');
+    businessPermitStatus.className='file-status '+(error?'error':'ok');
+  }
+  function updateAdvanceAmount(){
+    const el=document.querySelector('input[name="plan"]:checked');
+    advanceAmount.textContent=el?(el.dataset.advance+' advance'):'Select a plan';
+    bizPermitSection.hidden=!isBizPlan();
+    if(!isBizPlan()){businessPermit.value='';businessPermitStatus.textContent='No Business Permit selected.';businessPermitStatus.className='file-status';}
+    else showPermitStatus();
+  }
   function newRequestId(){if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();return 'REQ-'+Date.now()+'-'+Math.random().toString(36).slice(2,12);}
   function requestId(){let id='';try{id=sessionStorage.getItem(REQUEST_KEY)||'';}catch(_){ }if(!id){id=newRequestId();try{sessionStorage.setItem(REQUEST_KEY,id);}catch(_){ }}return id;}
 
@@ -287,6 +331,15 @@
     if(missing.length){setStatus('err','Please complete the required details',missing.join(', '));return false;}
     const digits=contact.value.replace(/\D/g,'');
     if(digits.length<10||digits.length>13){setStatus('err','Check Contact Number','Please enter a valid Philippine mobile number.');return false;}
+    if(isBizPlan()){
+      const permitError=validatePermitFile();
+      if(permitError){
+        businessPermitStatus.textContent=permitError;businessPermitStatus.className='file-status error';
+        setStatus('err','Business Permit required',permitError);
+        bizPermitSection.scrollIntoView({behavior:'smooth',block:'center'});
+        businessPermit.focus({preventScroll:true});return false;
+      }
+    }
     termsError.classList.remove('show');termsError.textContent='';
     if(!termsAccepted.checked){
       termsError.textContent='Please read and accept the Service Terms & Conditions before submitting.';
@@ -432,7 +485,15 @@
       p_agreement_name:agreementName.value.trim(),
       p_terms_version:TERMS_VERSION
     };
-    const res=await fetch(RPC_URL,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body)});
+    let res;
+    if(isBizPlan()){
+      const upload=new FormData();
+      upload.append('application',JSON.stringify(body));
+      upload.append('business_permit',permitFile(),permitFile().name);
+      res=await fetch(BIZ_ENDPOINT,{method:'POST',headers:{apikey:SUPABASE_KEY},body:upload});
+    }else{
+      res=await fetch(RPC_URL,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body)});
+    }
     const text=await res.text();let data=null;try{data=text?JSON.parse(text):null;}catch(_){data=null;}
     if(!res.ok)throw new Error(data&&data.message?data.message:'Unable to create ticket.');
     if(!data||data.ok!==true||!data.ticket_no)throw new Error('Ticket number was not returned. Please try again.');
@@ -460,10 +521,11 @@
           throw new Error((gpsError&&gpsError.message?gpsError.message:'GPS could not determine your location.')+' Tap “Use Manual Google Maps Pin Instead” below to continue.');
         }
       }
-      submitBtn.textContent='CREATING YOUR INSTALLATION TICKET…';
+      submitBtn.textContent=isBizPlan()?'UPLOADING BUSINESS PERMIT & CREATING TICKET…':'CREATING YOUR INSTALLATION TICKET…';
       setStatus('','Submitting your request',current.source==='manual'?'Self-confirmed manual map pin. Creating your installation ticket.':'GPS location captured. Please keep this page open while we create your ticket.');
       const result=await createTicket();
       ticketNumber.textContent=result.ticket_no;
+      bizPermitSuccess.hidden=!isBizPlan();
       formContent.style.display='none';
       successContent.classList.add('show');
       try{sessionStorage.removeItem(REQUEST_KEY);}catch(_){ }
@@ -476,6 +538,7 @@
 
   document.querySelectorAll('input[name="plan"]').forEach(el=>el.addEventListener('change',updateAdvanceAmount));
   updateAdvanceAmount();
+  businessPermit.addEventListener('change',()=>{if(isBizPlan())showPermitStatus();if(statusEl.classList.contains('err'))clearStatus();});
   submitBtn.addEventListener('click',submit);
   [termsAccepted,agreementName].forEach(el=>el.addEventListener(el===termsAccepted?'change':'input',()=>{termsError.classList.remove('show');termsError.textContent='';}));
   manualToggle.addEventListener('click',()=>{showManualLocation();clearStatus();manualCoordinates.focus();});
