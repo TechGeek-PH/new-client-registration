@@ -626,8 +626,13 @@
           await captureLocation();
         }catch(gpsError){
           current=null;
-          showManualOption();
-          throw new Error((gpsError&&gpsError.message?gpsError.message:'GPS could not determine your location.')+' Tap “Use Manual Google Maps Pin Instead” below to continue.');
+          // Open the verified manual-map flow automatically when GPS is unavailable.
+          // No ticket is created until the client confirms the real installation pin.
+          showManualLocation();
+          setStatus('err','Location verification required','Automatic GPS was unavailable. Enter the actual installation pin below, review the map, confirm it, and press Verify Map Pin before submitting again.');
+          manualCoordinates.scrollIntoView({behavior:'smooth',block:'center'});
+          manualCoordinates.focus({preventScroll:true});
+          throw new Error((gpsError&&gpsError.message?gpsError.message:'GPS could not determine your location.')+' Manual Google Maps mode is now open. Review and verify the exact installation pin, then submit again.');
         }
       }
       submitBtn.textContent=isBizPlan()?'UPLOADING BUSINESS PERMIT & CREATING TICKET…':'CREATING YOUR INSTALLATION TICKET…';
@@ -651,8 +656,11 @@
       });
     }catch(e){
       submitting=false;submitBtn.disabled=false;submitBtn.textContent=manualMode&&manualVerified?'CONFIRM & SUBMIT VERIFIED INSTALLATION REQUEST':'CONFIRM & SUBMIT INSTALLATION REQUEST';
-      setStatus('err','Ticket not created',e&&e.message?e.message:'Please try again. If you already received a ticket number, do not submit again.');
-      submitStatus.scrollIntoView({behavior:'smooth',block:'center'});
+      setStatus('err','Ticket confirmation unavailable',e&&e.message?e.message:'Please try again. If a ticket number was already shown, do not submit again.');
+      if(!manualMode || !manualLocation.hidden){
+        // Keep the error visible above the submit button; manual location stays open.
+        submitStatus.scrollIntoView({behavior:'smooth',block:'center'});
+      }
     }
   }
 
