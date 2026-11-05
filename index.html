@@ -69,6 +69,18 @@
     .billing-note{margin-top:12px;padding:14px 15px;border:1px solid #2b4863;border-radius:13px;background:#0b1c2c;color:#b9cadc;font-size:12px;line-height:1.65}
     .billing-note b{display:block;color:#e6f6ff;font-size:13px;margin-bottom:6px}
     .billing-note p{margin:5px 0 0}
+    .adjustment-preview{margin-top:12px;padding:14px 15px;border:1px solid #326f85;border-radius:13px;background:#092538;color:#c3deed;font-size:12px;line-height:1.55}
+    .adjustment-preview b{display:block;color:#91f1ca;font-size:13px;margin-bottom:8px}
+    .adjustment-preview label.activation-date-label{display:block;color:#d7e8f4;font-weight:750;margin-bottom:5px}
+    .adjustment-preview input[type=date]{width:100%;max-width:250px;padding:10px;border:1px solid #416b83;border-radius:9px;background:#0a1b2b;color:#eef7ff;color-scheme:dark;font:inherit;font-size:13px}
+    .adjustment-preview .breakdown{margin:10px 0;padding:10px;border:1px solid #34566b;border-radius:9px;background:#071c2d}
+    .adjustment-preview .money-line{display:flex;justify-content:space-between;gap:10px;padding:4px 0}
+    .adjustment-preview .money-line strong{color:#f3f9ff;text-align:right}
+    .adjustment-preview .total-line{border-top:1px solid #37566a;margin-top:6px;padding-top:10px;font-weight:900}
+    .adjustment-preview .total-line strong{color:#88f3c3;font-size:16px}
+    .adjustment-preview .option-line{display:flex;align-items:flex-start;gap:10px;color:#e4f8ff;font-size:12px;font-weight:750;cursor:pointer;padding:10px 0}
+    .adjustment-preview .option-line input{width:18px;height:18px;flex:0 0 18px;margin:1px 0 0;accent-color:#24c987}
+    .adjustment-preview .preview-foot{color:#97b0c2;font-size:11px;margin-top:8px;line-height:1.5}
     .location-note{margin-top:14px;padding:14px 15px;border:1px solid #28506d;border-radius:14px;background:rgba(12,34,53,.8);display:flex;gap:12px;align-items:flex-start}
     .location-icon{width:34px;height:34px;border-radius:10px;background:#0e3047;display:grid;place-items:center;flex:0 0 auto;font-size:17px}
     .location-note b{display:block;font-size:13px;color:#edf8ff}
@@ -196,10 +208,22 @@
         <div><b>FREE Installation · No separate activation fee</b><span class="advance-description">Only 1 month advance subscription payment is required upon installation and activation. This is payment for internet service, not an installation charge.</span></div>
         <strong id="advanceAmount">Select a plan</strong>
       </div>
+      <div class="adjustment-preview" aria-label="Estimated first bill and payment option">
+        <b>Automatic Prorated / Adjustment Bill Preview</b>
+        <label class="activation-date-label" for="estimatedActivationDate">Estimated installation / activation date</label>
+        <input type="date" id="estimatedActivationDate" required>
+        <p class="preview-foot">Estimate based on this date. The actual amount will be recalculated when your service is activated.</p>
+        <div id="prorationBreakdown" class="breakdown" aria-live="polite">Select an internet plan to see your bill estimate.</div>
+        <label class="option-line" for="includeProratedNow">
+          <input type="checkbox" id="includeProratedNow">
+          <span>I want to pay my prorated adjustment together with my 1-month advance subscription upon installation.</span>
+        </label>
+        <p id="prorationPaymentNote" class="preview-foot">This is a payment preference only. No payment is made when submitting this application.</p>
+      </div>
       <div class="billing-note" role="note">
         <b>First Billing Adjustment &amp; Monthly Cutoff</b>
-        <p>Your advance payment covers internet service starting on your activation date. Your first bill may include a prorated adjustment to align with our fixed billing cycle; the applicable advance payment will be credited to avoid double charging.</p>
-        <p>Billing date: <strong>10th of every month</strong>. Payment cutoff: <strong>17th of every month</strong>. Unpaid accounts are subject to <strong>automatic disconnection after the cutoff</strong>.</p>
+        <p>The prorated adjustment covers service from actual activation until the next billing 10th. The 1-month advance is applied to the following monthly cycle, avoiding double charges. The estimate is not a paid bill or payment receipt.</p>
+        <p>Billing due date: <strong>10th of every month</strong>. Payment grace period: through the <strong>17th</strong>. Unpaid accounts may be disconnected after the cutoff.</p>
       </div>
 
       <div class="location-note">
@@ -232,7 +256,7 @@
           <h3>Internet Service Agreement · Effective November 1, 2026</h3>
           <section><h4>1. Internet Speed &amp; Service</h4><p>Plan speeds are advertised as “up to” the selected rate. Actual performance may vary due to devices, Wi-Fi conditions, network traffic, equipment, and upstream connectivity. Scheduled maintenance and necessary repairs may temporarily affect service.</p></section>
           <section><h4>2. Customer Responsibilities</h4><p>Customers must provide accurate contact and installation details, allow authorized TECHGEEKPH staff reasonable access for agreed installation or repair work, and care for installed cables and equipment. Disclosed charges may apply for customer-caused damage or unauthorized tampering.</p></section>
-          <section><h4>3. Installation, Advance Payment &amp; Billing</h4><p>For the plans shown in this application, installation is FREE with no separate activation fee. One month of advance subscription payment is required upon installation and activation and pays for internet service, not installation. Regular billing is on the 10th of each month. A first-bill prorated adjustment may align service with the fixed billing cycle; applicable advance payment must be credited to avoid double charging. Payments must use official TECHGEEKPH channels.</p></section>
+          <section><h4>3. Installation, Advance Payment &amp; Billing</h4><p>For the plans shown in this application, installation is FREE with no separate activation fee. One month of advance subscription payment is required upon installation and activation and pays for internet service, not installation. Regular billing is on the 10th of each month. A prorated adjustment covers the days from actual activation to the next 10th; the one-month advance covers the next billing cycle. The client may request to pay the adjustment together with the advance on installation or separately on the first billing date, with no duplicate billing. Any quote shown on the application is an estimate: final dates and amounts depend on actual activation and verified payments. Payments must use official TECHGEEKPH channels.</p></section>
           <section><h4>4. Payment Cutoff, Disconnection &amp; Reconnection</h4><p>Monthly payment is due every 10th, with a grace period through the 17th. Unpaid accounts may be automatically disconnected after 11:59 PM on the 17th (beginning of the 18th). Reconnection is subject to payment verification and any applicable charges disclosed to the customer.</p></section>
           <section><h4>5. Router / ONU Ownership &amp; Equipment Care</h4><p>TECHGEEKPH-provided routers, ONUs and equipment supplied on loan remain company property unless separately sold. Customers must avoid unauthorized resetting, modification, removal, or damage. Loaned equipment must be returned upon termination or permanent disconnection. Customer-caused loss or damage may be subject to disclosed repair or replacement charges, subject to law.</p></section>
           <section><h4>6. Service Interruptions &amp; Rebates</h4><p>Service may be interrupted by maintenance, power failure, cable cuts, upstream issues, emergencies, or events outside reasonable company control. For a verified full-service interruption lasting more than 24 hours, the customer may request an eligible rebate in writing within 7 days of the incident. The usual basis is monthly service fee divided by 30 multiplied by verified qualifying outage days, subject to review and applicable law.</p></section>
@@ -260,6 +284,7 @@
       <p class="lead">Your installation request has been received and added to the installation queue.</p>
       <p class="lead" id="bizPermitSuccess" hidden>Your Business Permit has been securely received and is pending staff verification.</p>
       <div class="ticket-box"><span>Installation Ticket Number</span><strong id="ticketNumber">—</strong></div>
+      <p id="preferenceWarning" class="terms-error" role="alert" hidden>Your installation ticket was created, but your adjustment payment preference could not be saved. Please inform the technician or office staff of your preferred payment option when your service is activated.</p>
       <div class="queue-msg"><b>Your request is now lined up for installation.</b><br><br>Please keep your phone available and wait for a <b>call or text from our technician</b>. We cannot guarantee an exact installation date because field schedules depend on current workload, and active repair concerns are prioritized to restore affected clients first.<br><br>Thank you for your patience. Please keep your ticket number for reference.</div>
     </div>
   </section>
@@ -273,6 +298,7 @@
   const SUPABASE_URL='https://tcexzfztdgximrzuosqs.supabase.co';
   const SUPABASE_KEY='sb_publishable_8H8_S7NTWvzPCLvYUe2C4g_k3Ltjfiz';
   const RPC_URL=SUPABASE_URL+'/rest/v1/rpc/public_create_installation_ticket_with_terms';
+  const ADJUSTMENT_RPC_URL=SUPABASE_URL+'/rest/v1/rpc/public_record_installation_adjustment_choice';
   const BIZ_ENDPOINT=SUPABASE_URL+'/functions/v1/public-biz-permit-installation';
   const BIZ_PLAN='Biz Plan ₱1,599/month – up to 200 Mbps';
   const BIZ_MAX_SIZE=10*1024*1024;
@@ -286,6 +312,8 @@
   const reviewManualPinBtn=$('reviewManualPin'),verifyManualPinBtn=$('verifyManualPin'),manualPreview=$('manualPreview'),manualMapFrame=$('manualMapFrame'),manualMapLink=$('manualMapLink'),manualPinFeedback=$('manualPinFeedback');
   const termsAccepted=$('termsAccepted'),agreementName=$('agreementName'),termsBlock=$('termsBlock'),termsError=$('termsError');
   const bizPermitSection=$('bizPermitSection'),businessPermit=$('businessPermit'),businessPermitStatus=$('businessPermitStatus'),bizPermitSuccess=$('bizPermitSuccess');
+  const estimatedActivationDate=$('estimatedActivationDate'),includeProratedNow=$('includeProratedNow');
+  const prorationBreakdown=$('prorationBreakdown'),prorationPaymentNote=$('prorationPaymentNote'),preferenceWarning=$('preferenceWarning');
   let current=null,submitting=false,manualMode=false,manualReviewed=null,manualVerified=null;
 
   const params=new URLSearchParams(window.location.search);
@@ -311,12 +339,56 @@
     businessPermitStatus.textContent=error || ('Ready to upload: '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB).');
     businessPermitStatus.className='file-status '+(error?'error':'ok');
   }
+  function todayInManila(){
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+    const value=type=>parts.find(p=>p.type===type).value;
+    return value('year')+'-'+value('month')+'-'+value('day');
+  }
+  function previewDate(value){
+    if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value||''))return null;
+    const [year,month,day]=value.split('-').map(Number);
+    const date=new Date(Date.UTC(year,month-1,day));
+    return date.toISOString().slice(0,10)===value?date:null;
+  }
+  function monthTenth(date,offset){
+    return new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+offset,10));
+  }
+  function displayDate(date){
+    return new Intl.DateTimeFormat('en-US',{timeZone:'UTC',month:'long',day:'numeric',year:'numeric'}).format(date);
+  }
+  function money(value){return '₱'+Number(value).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function renderAdjustmentPreview(){
+    const selected=document.querySelector('input[name="plan"]:checked');
+    includeProratedNow.disabled=!selected;
+    if(!selected){prorationBreakdown.textContent='Select an internet plan to see your bill estimate.';return;}
+    const activation=previewDate(estimatedActivationDate.value);
+    if(!activation){prorationBreakdown.textContent='Select a valid estimated activation date.';return;}
+    const monthly=Number(selected.dataset.advance.replace(/[^0-9.]/g,''));
+    const firstTenth=activation.getUTCDate()<10?monthTenth(activation,0):monthTenth(activation,1);
+    const days=Math.min(30,Math.max(0,Math.round((firstTenth-activation)/86400000)));
+    const adjustment=Math.round(monthly/30*days*100)/100;
+    const together=includeProratedNow.checked;
+    const total=Math.round((monthly+(together?adjustment:0))*100)/100;
+    const nextRegular=monthTenth(firstTenth,1);
+    const period=days?' ('+displayDate(activation)+' to '+displayDate(new Date(firstTenth.getTime()-86400000))+')':' (activation starts on billing date)';
+    prorationBreakdown.innerHTML=
+      '<div class="money-line"><span>1-month advance</span><strong>'+money(monthly)+'</strong></div>'+
+      '<div class="money-line"><span>Prorated adjustment: '+days+' day'+(days===1?'':'s')+period+'</span><strong>'+money(adjustment)+'</strong></div>'+
+      '<div class="money-line total-line"><span>Estimated total to pay on installation</span><strong>'+money(total)+'</strong></div>'+
+      (together?'<div class="money-line"><span>Remaining first adjustment</span><strong>₱0.00 (when verified paid)</strong></div>':
+        '<div class="money-line"><span>First adjustment due: '+displayDate(firstTenth)+'</span><strong>'+money(adjustment)+'</strong></div>')+
+      '<div class="money-line"><span>Next regular monthly due date</span><strong>'+displayDate(nextRegular)+'</strong></div>';
+    prorationPaymentNote.textContent=together?
+      'You selected to pay the prorated adjustment together with your advance upon activation. Payment is still subject to collection and verification.':
+      'Only the 1-month advance is estimated for collection on activation. The adjustment remains due on the first billing 10th unless paid earlier.';
+  }
   function updateAdvanceAmount(){
     const el=document.querySelector('input[name="plan"]:checked');
     advanceAmount.textContent=el?(el.dataset.advance+' advance'):'Select a plan';
     bizPermitSection.hidden=!isBizPlan();
     if(!isBizPlan()){businessPermit.value='';businessPermitStatus.textContent='No Business Permit selected.';businessPermitStatus.className='file-status';}
     else showPermitStatus();
+    renderAdjustmentPreview();
   }
   function newRequestId(){if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();return 'REQ-'+Date.now()+'-'+Math.random().toString(36).slice(2,12);}
   function requestId(){let id='';try{id=sessionStorage.getItem(REQUEST_KEY)||'';}catch(_){ }if(!id){id=newRequestId();try{sessionStorage.setItem(REQUEST_KEY,id);}catch(_){ }}return id;}
@@ -328,6 +400,7 @@
     if(!address.value.trim())missing.push('Installation Address');
     if(!landmark.value.trim())missing.push('Nearest Landmark');
     if(!selectedPlan())missing.push('Preferred Plan');
+    if(!previewDate(estimatedActivationDate.value))missing.push('Valid Estimated Activation Date');
     if(missing.length){setStatus('err','Please complete the required details',missing.join(', '));return false;}
     const digits=contact.value.replace(/\D/g,'');
     if(digits.length<10||digits.length>13){setStatus('err','Check Contact Number','Please enter a valid Philippine mobile number.');return false;}
@@ -500,6 +573,21 @@
     return data;
   }
 
+  async function saveAdjustmentChoice(ticketNo){
+    const response=await fetch(ADJUSTMENT_RPC_URL,{
+      method:'POST',
+      headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({
+        p_request_id:requestId(),
+        p_ticket_no:ticketNo,
+        p_include_with_advance:includeProratedNow.checked,
+        p_estimated_activation_date:estimatedActivationDate.value
+      })
+    });
+    if(!response.ok)throw new Error('Unable to record adjustment payment preference.');
+    const data=await response.json();
+    if(!data||data.ok!==true)throw new Error('Adjustment payment preference was not confirmed.');
+  }
   async function submit(){
     if(submitting)return;
     clearStatus();
@@ -524,7 +612,12 @@
       submitBtn.textContent=isBizPlan()?'UPLOADING BUSINESS PERMIT & CREATING TICKET…':'CREATING YOUR INSTALLATION TICKET…';
       setStatus('','Submitting your request',current.source==='manual'?'Self-confirmed manual map pin. Creating your installation ticket.':'GPS location captured. Please keep this page open while we create your ticket.');
       const result=await createTicket();
+      let adjustmentSaved=true;
+      try{await saveAdjustmentChoice(result.ticket_no);}
+      catch(error){adjustmentSaved=false;console.warn('Could not record installation adjustment preference:',error);}
       ticketNumber.textContent=result.ticket_no;
+      preferenceWarning.hidden=adjustmentSaved;
+      preferenceWarning.classList.toggle('show',!adjustmentSaved);
       bizPermitSuccess.hidden=!isBizPlan();
       formContent.style.display='none';
       successContent.classList.add('show');
@@ -537,6 +630,10 @@
   }
 
   document.querySelectorAll('input[name="plan"]').forEach(el=>el.addEventListener('change',updateAdvanceAmount));
+  estimatedActivationDate.value=todayInManila();
+  estimatedActivationDate.min=todayInManila();
+  estimatedActivationDate.addEventListener('change',renderAdjustmentPreview);
+  includeProratedNow.addEventListener('change',renderAdjustmentPreview);
   updateAdvanceAmount();
   businessPermit.addEventListener('change',()=>{if(isBizPlan())showPermitStatus();if(statusEl.classList.contains('err'))clearStatus();});
   submitBtn.addEventListener('click',submit);
