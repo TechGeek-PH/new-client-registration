@@ -56,6 +56,9 @@
     }
     input.text-input::placeholder{color:#60758d}
     input.text-input:focus{border-color:#35bde8;background:#091a2a;box-shadow:0 0 0 3px rgba(50,199,255,.10)}
+    input.text-input[aria-invalid="true"],.adjustment-preview input[type=date][aria-invalid="true"]{border-color:#f28da4!important;box-shadow:0 0 0 2px rgba(242,141,164,.13)}
+    .form-error-summary{border:1px solid #7e3042;border-radius:12px;padding:11px 13px;background:#281019;color:#ffd4dc;font-size:12px;line-height:1.55;margin:14px 0}
+    .form-error-summary[hidden]{display:none}
     .plans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .plan{position:relative;display:flex;align-items:center;gap:11px;min-height:70px;padding:13px;border:1px solid var(--line);border-radius:14px;background:#081727;cursor:pointer;transition:.18s border-color,.18s transform,.18s background}
     .plan:hover{border-color:#35658a;background:#0a1b2e;transform:translateY(-1px)}
@@ -273,6 +276,7 @@
           <div id="termsError" class="terms-error" role="alert" aria-live="polite"></div>
         </div>
       </div>
+      <div id="submitStatus" class="status" role="alert" aria-live="assertive" aria-atomic="true"></div>
       <button id="submitBtn" class="submit-btn" type="button">CONFIRM &amp; SUBMIT INSTALLATION REQUEST</button>
       <p class="submit-note">Tap Submit once. Automatic GPS will be requested only in GPS mode; manual mode requires a reviewed and confirmed map pin.</p>
       <p class="privacy">Device location is requested only when you submit using automatic GPS. Manual map pins are self-confirmed and may be checked by a technician. TechGeekPH does not continuously track your device.</p>
@@ -307,7 +311,7 @@
   const REQUEST_KEY='tg_public_install_request_id';
   const $=id=>document.getElementById(id);
   const clientName=$('clientName'),contact=$('contact'),address=$('address'),landmark=$('landmark');
-  const submitBtn=$('submitBtn'),statusEl=$('status'),formContent=$('formContent'),successContent=$('successContent'),ticketNumber=$('ticketNumber'),advanceAmount=$('advanceAmount');
+  const submitBtn=$('submitBtn'),statusEl=$('status'),submitStatus=$('submitStatus'),formContent=$('formContent'),successContent=$('successContent'),ticketNumber=$('ticketNumber'),advanceAmount=$('advanceAmount');
   const manualToggle=$('manualToggle'),manualLocation=$('manualLocation'),manualCoordinates=$('manualCoordinates'),confirmManualLocation=$('confirmManualLocation'),retryAutoGps=$('retryAutoGps');
   const reviewManualPinBtn=$('reviewManualPin'),verifyManualPinBtn=$('verifyManualPin'),manualPreview=$('manualPreview'),manualMapFrame=$('manualMapFrame'),manualMapLink=$('manualMapLink'),manualPinFeedback=$('manualPinFeedback');
   const termsAccepted=$('termsAccepted'),agreementName=$('agreementName'),termsBlock=$('termsBlock'),termsError=$('termsError');
@@ -321,8 +325,20 @@
   if(params.get('contact'))contact.value=params.get('contact');
 
   function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));}
-  function setStatus(kind,title,detail){statusEl.className='status show '+(kind||'');statusEl.innerHTML='<div class="title">'+esc(title)+'</div><div class="small">'+esc(detail||'')+'</div>';}
-  function clearStatus(){statusEl.className='status';statusEl.innerHTML='';}
+  function setStatus(kind,title,detail){
+    const html='<div class="title">'+esc(title)+'</div><div class="small">'+esc(detail||'')+'</div>';
+    [statusEl,submitStatus].forEach(el=>{el.className='status show '+(kind||'');el.innerHTML=html;});
+  }
+  function clearStatus(){[statusEl,submitStatus].forEach(el=>{el.className='status';el.innerHTML='';});}
+  function highlightMissing(fields){
+    [clientName,contact,address,landmark,estimatedActivationDate,agreementName].forEach(el=>el.removeAttribute('aria-invalid'));
+    fields.forEach(el=>el.setAttribute('aria-invalid','true'));
+    if(fields.length){
+      const first=fields[0];
+      first.scrollIntoView({behavior:'smooth',block:'center'});
+      first.focus({preventScroll:true});
+    }
+  }
   function selectedPlan(){const el=document.querySelector('input[name="plan"]:checked');return el?el.value:'';}
   function isBizPlan(){return selectedPlan()===BIZ_PLAN;}
   function permitFile(){return businessPermit.files&&businessPermit.files[0];}
@@ -394,16 +410,16 @@
   function requestId(){let id='';try{id=sessionStorage.getItem(REQUEST_KEY)||'';}catch(_){ }if(!id){id=newRequestId();try{sessionStorage.setItem(REQUEST_KEY,id);}catch(_){ }}return id;}
 
   function validateDetails(){
-    const missing=[];
-    if(!clientName.value.trim())missing.push('Full Name');
-    if(!contact.value.trim())missing.push('Contact Number');
-    if(!address.value.trim())missing.push('Installation Address');
-    if(!landmark.value.trim())missing.push('Nearest Landmark');
+    const missing=[],fields=[];
+    if(!clientName.value.trim()){missing.push('Full Name');fields.push(clientName);}
+    if(!contact.value.trim()){missing.push('Contact Number');fields.push(contact);}
+    if(!address.value.trim()){missing.push('Installation Address');fields.push(address);}
+    if(!landmark.value.trim()){missing.push('Nearest Landmark');fields.push(landmark);}
     if(!selectedPlan())missing.push('Preferred Plan');
-    if(!previewDate(estimatedActivationDate.value))missing.push('Valid Estimated Activation Date');
-    if(missing.length){setStatus('err','Please complete the required details',missing.join(', '));return false;}
+    if(!previewDate(estimatedActivationDate.value)){missing.push('Valid Estimated Activation Date');fields.push(estimatedActivationDate);}
+    if(missing.length){setStatus('err','Please complete the required details',missing.join(', ')+'. No ticket has been created yet.');highlightMissing(fields);if(!fields.length)submitStatus.scrollIntoView({behavior:'smooth',block:'center'});return false;}
     const digits=contact.value.replace(/\D/g,'');
-    if(digits.length<10||digits.length>13){setStatus('err','Check Contact Number','Please enter a valid Philippine mobile number.');return false;}
+    if(digits.length<10||digits.length>13){setStatus('err','Check Contact Number','Please enter a valid Philippine mobile number.');highlightMissing([contact]);return false;}
     if(isBizPlan()){
       const permitError=validatePermitFile();
       if(permitError){
@@ -416,12 +432,17 @@
     termsError.classList.remove('show');termsError.textContent='';
     if(!termsAccepted.checked){
       termsError.textContent='Please read and accept the Service Terms & Conditions before submitting.';
-      termsError.classList.add('show');termsBlock.scrollIntoView({behavior:'smooth',block:'center'});termsAccepted.focus({preventScroll:true});return false;
+      termsError.classList.add('show');
+      setStatus('err','Terms acceptance required','Read and check the Service Terms & Conditions before a ticket can be created.');
+      termsBlock.scrollIntoView({behavior:'smooth',block:'center'});termsAccepted.focus({preventScroll:true});return false;
     }
     if(agreementName.value.trim().length<3){
       termsError.textContent='Enter the full name of the person accepting the terms.';
-      termsError.classList.add('show');agreementName.focus();return false;
+      termsError.classList.add('show');
+      setStatus('err','Agreement name required','Enter the full name of the client or authorized person accepting the terms.');
+      highlightMissing([agreementName]);return false;
     }
+    highlightMissing([]);
     return true;
   }
 
@@ -573,12 +594,12 @@
     return data;
   }
 
-  async function saveAdjustmentChoice(ticketNo){
+  async function saveAdjustmentChoice(ticketNo,applicationRequestId){
     const response=await fetch(ADJUSTMENT_RPC_URL,{
       method:'POST',
       headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify({
-        p_request_id:requestId(),
+        p_request_id:applicationRequestId,
         p_ticket_no:ticketNo,
         p_include_with_advance:includeProratedNow.checked,
         p_estimated_activation_date:estimatedActivationDate.value
@@ -611,21 +632,27 @@
       }
       submitBtn.textContent=isBizPlan()?'UPLOADING BUSINESS PERMIT & CREATING TICKET…':'CREATING YOUR INSTALLATION TICKET…';
       setStatus('','Submitting your request',current.source==='manual'?'Self-confirmed manual map pin. Creating your installation ticket.':'GPS location captured. Please keep this page open while we create your ticket.');
+      const createdRequestId=requestId();
       const result=await createTicket();
-      let adjustmentSaved=true;
-      try{await saveAdjustmentChoice(result.ticket_no);}
-      catch(error){adjustmentSaved=false;console.warn('Could not record installation adjustment preference:',error);}
+      // Display the confirmed ticket immediately. Optional billing-preference saving
+      // must NEVER delay or hide an already-created installation ticket.
       ticketNumber.textContent=result.ticket_no;
-      preferenceWarning.hidden=adjustmentSaved;
-      preferenceWarning.classList.toggle('show',!adjustmentSaved);
+      preferenceWarning.hidden=true;
+      preferenceWarning.classList.remove('show');
       bizPermitSuccess.hidden=!isBizPlan();
       formContent.style.display='none';
       successContent.classList.add('show');
       try{sessionStorage.removeItem(REQUEST_KEY);}catch(_){ }
       window.scrollTo({top:0,behavior:'smooth'});
+      saveAdjustmentChoice(result.ticket_no,createdRequestId).catch(error=>{
+        console.warn('Could not record installation adjustment preference:',error);
+        preferenceWarning.hidden=false;
+        preferenceWarning.classList.add('show');
+      });
     }catch(e){
       submitting=false;submitBtn.disabled=false;submitBtn.textContent=manualMode&&manualVerified?'CONFIRM & SUBMIT VERIFIED INSTALLATION REQUEST':'CONFIRM & SUBMIT INSTALLATION REQUEST';
-      setStatus('err','Unable to submit request',e&&e.message?e.message:'Please try again.');
+      setStatus('err','Ticket not created',e&&e.message?e.message:'Please try again. If you already received a ticket number, do not submit again.');
+      submitStatus.scrollIntoView({behavior:'smooth',block:'center'});
     }
   }
 
@@ -634,7 +661,7 @@
   estimatedActivationDate.min=todayInManila();
   const futureLimit=new Date(Date.now()+365*86400000);
   estimatedActivationDate.max=todayInManila(futureLimit);
-  estimatedActivationDate.addEventListener('change',renderAdjustmentPreview);
+  estimatedActivationDate.addEventListener('change',()=>{estimatedActivationDate.removeAttribute('aria-invalid');renderAdjustmentPreview();});
   includeProratedNow.addEventListener('change',renderAdjustmentPreview);
   updateAdvanceAmount();
   businessPermit.addEventListener('change',()=>{if(isBizPlan())showPermitStatus();if(statusEl.classList.contains('err'))clearStatus();});
@@ -654,7 +681,10 @@
     }
     if(statusEl.classList.contains('err'))clearStatus();
   });
-  [clientName,contact,address,landmark].forEach(el=>el.addEventListener('input',()=>{if(statusEl.classList.contains('err'))clearStatus();}));
+  [clientName,contact,address,landmark,agreementName].forEach(el=>el.addEventListener('input',()=>{
+    el.removeAttribute('aria-invalid');
+    if(statusEl.classList.contains('err'))clearStatus();
+  }));
   if(!window.isSecureContext||!navigator.geolocation){
     showManualOption();
     setStatus('err','Automatic GPS is unavailable','Open the HTTPS link in Chrome or tap the manual Google Maps pin button below to continue.');
