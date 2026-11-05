@@ -339,8 +339,8 @@
     businessPermitStatus.textContent=error || ('Ready to upload: '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB).');
     businessPermitStatus.className='file-status '+(error?'error':'ok');
   }
-  function todayInManila(){
-    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  function todayInManila(date=new Date()){
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);
     const value=type=>parts.find(p=>p.type===type).value;
     return value('year')+'-'+value('month')+'-'+value('day');
   }
@@ -633,7 +633,7 @@
   estimatedActivationDate.value=todayInManila();
   estimatedActivationDate.min=todayInManila();
   const futureLimit=new Date(Date.now()+365*86400000);
-  estimatedActivationDate.max=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(futureLimit).replace(/^(\d{4})-(\d{2})-(\d{2})$/,'$1-$2-$3');
+  estimatedActivationDate.max=todayInManila(futureLimit);
   estimatedActivationDate.addEventListener('change',renderAdjustmentPreview);
   includeProratedNow.addEventListener('change',renderAdjustmentPreview);
   updateAdvanceAmount();
