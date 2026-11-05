@@ -657,8 +657,9 @@
     }catch(e){
       submitting=false;submitBtn.disabled=false;submitBtn.textContent=manualMode&&manualVerified?'CONFIRM & SUBMIT VERIFIED INSTALLATION REQUEST':'CONFIRM & SUBMIT INSTALLATION REQUEST';
       setStatus('err','Ticket confirmation unavailable',e&&e.message?e.message:'Please try again. If a ticket number was already shown, do not submit again.');
-      if(!manualMode || !manualLocation.hidden){
-        // Keep the error visible above the submit button; manual location stays open.
+      if(!manualMode){
+        // For ordinary validation/network errors, show the message beside Submit.
+        // If GPS failed, keep the newly-opened manual pin input in view instead.
         submitStatus.scrollIntoView({behavior:'smooth',block:'center'});
       }
     }
